@@ -1,22 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import 'fastestsmallesttextencoderdecoder'
+import { StatusBar } from 'expo-status-bar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { PersistGate } from 'redux-persist/integration/react'
+import { Provider } from 'react-redux'
 
-import useCachedResources from './hooks/useCachedResources';
-import useColorScheme from './hooks/useColorScheme';
-import Navigation from './navigation';
+import useCachedResources from './hooks/useCachedResources'
+import Navigation from './navigation'
+import { store, persistor } from './store/index'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 export default function App() {
-  const isLoadingComplete = useCachedResources();
-  const colorScheme = useColorScheme();
+  const isLoadingComplete = useCachedResources()
 
   if (!isLoadingComplete) {
-    return null;
+    return null
   } else {
     return (
-      <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-      </SafeAreaProvider>
-    );
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <SafeAreaProvider>
+              <Navigation />
+              <StatusBar />
+            </SafeAreaProvider>
+          </PersistGate>
+        </Provider>
+      </GestureHandlerRootView>
+    )
   }
 }

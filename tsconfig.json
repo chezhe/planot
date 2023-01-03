@@ -1,6 +1,8 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "baseUrl": "."
+  },
+  "exclude": ["node_modules", "*.js", "assets", "patches", "dist"]
 }
