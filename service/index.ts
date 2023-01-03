@@ -64,6 +64,7 @@ export default class Relayer {
               {
                 authors: [address],
                 kinds: [1],
+                limit: 20,
               },
             ])
 
@@ -103,8 +104,6 @@ export default class Relayer {
 
             const posts: Event[] = []
             sub?.on('event', (event: Event) => {
-              console.log('followed', event)
-
               posts.push(event)
             })
             sub?.on('eose', () => {

@@ -1,14 +1,19 @@
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
-import { useWindowDimensions } from 'react-native'
+import { Pressable, useWindowDimensions } from 'react-native'
 import { Image, StyleSheet } from 'react-native'
 import Relayer from 'service'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Fonts from 'theme/Fonts'
-import { Profile } from 'types'
+import { PreviewOfURL, Profile } from 'types'
 import { ellipsis } from 'utils'
+import { getLinkPreview } from 'link-preview-js'
 import { Text, View } from './Themed'
+import Preview from './Preview'
+import Content from './Content'
+import { useNavigation } from '@react-navigation/native'
+import PostBar from './PostBar'
 
 export default function Post({
   post,
@@ -18,12 +23,17 @@ export default function Post({
   profile?: Profile
 }) {
   const [iprofile, setIProfile] = useState(profile)
+  const [preview, setPreview] = useState<PreviewOfURL>()
+
   const profiles = useAppSelector((state) => state.profile)
   const dispatch = useAppDispatch()
   const { width } = useWindowDimensions()
+  const navigation = useNavigation()
 
   useEffect(() => {
-    if (profiles[post.pubkey]) {
+    if (profile) {
+      setIProfile(profile)
+    } else if (profiles[post.pubkey]) {
       setIProfile(profiles[post.pubkey])
     } else {
       async function initRelay() {
@@ -50,17 +60,39 @@ export default function Post({
     }
   }, [iprofile, profiles])
 
+  useEffect(() => {
+    getLinkPreview(post.content)
+      .then((data) => {
+        console.log(data)
+        setPreview(data)
+      })
+      .catch(console.error)
+  }, [post])
+
+  const contentWidth = width - 20 - 50 - 8 - 20
+
   return (
     <View
       style={{
         flexDirection: 'row',
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 20,
         borderBottomColor: '#999',
         borderBottomWidth: StyleSheet.hairlineWidth,
       }}
     >
-      <Image source={{ uri: iprofile?.picture }} style={styles.pavatar} />
+      <Pressable
+        onPress={() => navigation.navigate('Account', { pubkey: post.pubkey })}
+      >
+        <Image
+          source={
+            iprofile?.picture
+              ? { uri: iprofile?.picture }
+              : require('../assets/images/default-avatar.png')
+          }
+          style={styles.pavatar}
+        />
+      </Pressable>
 
       <View style={{ paddingLeft: 8, paddingTop: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -76,16 +108,20 @@ export default function Post({
             {dayjs(post.created_at * 1000).fromNow()}
           </Text>
         </View>
-        <Text
-          style={[
-            styles.post,
-            {
-              width: width - 20 - 50 - 8 - 20,
-            },
-          ]}
-        >
-          {post.content}
-        </Text>
+        {preview && preview.url === post.content ? null : (
+          <Text
+            style={[
+              styles.post,
+              {
+                width: contentWidth,
+              },
+            ]}
+          >
+            <Content content={post.content} />
+          </Text>
+        )}
+        <Preview preview={preview} />
+        <PostBar post={post} />
       </View>
     </View>
   )

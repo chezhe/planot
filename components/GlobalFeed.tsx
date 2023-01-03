@@ -2,8 +2,9 @@ import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 import Relayer from 'service'
+import { CircleFade } from 'react-native-animated-spinkit'
 import Post from './Post'
-import { Text } from './Themed'
+import { Text, View } from './Themed'
 
 export default function GlobalFeed() {
   const [page, setPage] = useState(0)
@@ -14,20 +15,38 @@ export default function GlobalFeed() {
     async function init() {
       try {
         const service = new Relayer()
+        setIsLoading(true)
         setTimeout(() => {
           service
             .getGlobalFeed()
             .then((res) => {
-              console.log('posts', res)
+              setIsLoading(false)
               setPosts(res)
             })
-            .catch(console.error)
+            .catch(() => {
+              setIsLoading(false)
+            })
         }, 10000)
       } catch (error) {}
     }
 
     init()
   }, [])
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 50,
+        }}
+      >
+        <CircleFade size={100} color="#999" />
+      </View>
+    )
+  }
 
   return (
     <FlatList

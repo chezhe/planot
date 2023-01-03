@@ -18,7 +18,8 @@ declare global {
 
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined
-  Account: { address: string }
+  Account: { pubkey: string }
+  HashTag: { tag: string }
   Modal: undefined
   NotFound: undefined
 }
@@ -42,4 +43,22 @@ export interface Profile {
   name: string
   picture: string
   about: string
+}
+
+export type PreviewOfURL = {
+  url: string
+  title?: string
+  siteName?: string | undefined
+  description?: string | undefined
+  mediaType: string
+  contentType: string | undefined
+  images?: string[]
+  videos?: {
+    url: string | undefined
+    secureUrl: string | null | undefined
+    type: string | null | undefined
+    width: string | undefined
+    height: string | undefined
+  }[]
+  favicons: string[]
 }

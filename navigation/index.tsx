@@ -13,7 +13,7 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import * as React from 'react'
 
-import Colors from '../constants/Colors'
+import Colors from 'theme/Colors'
 import useColorScheme from '../hooks/useColorScheme'
 import ModalScreen from '../screens/ModalScreen'
 import NotFoundScreen from '../screens/NotFoundScreen'
@@ -34,6 +34,7 @@ import {
 } from 'iconoir-react-native'
 import Account from '../screens/Account'
 import Messages from '../screens/Messages'
+import HashTag from 'screens/HashTag'
 
 export default function Navigation() {
   const colorScheme = useColorScheme()
@@ -65,6 +66,11 @@ function RootNavigator() {
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
+        options={{ title: 'Oops!' }}
+      />
+      <Stack.Screen
+        name="HashTag"
+        component={HashTag}
         options={{ title: 'Oops!' }}
       />
       <Stack.Screen

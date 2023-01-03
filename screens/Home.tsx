@@ -12,6 +12,7 @@ import useColorScheme from '../hooks/useColorScheme'
 import PagerView from 'react-native-pager-view'
 import Feed from '../components/Feed'
 import GlobalFeed from '../components/GlobalFeed'
+import { EditPencil, UserCircleAlt } from 'iconoir-react-native'
 
 dayjs.extend(relativeTime)
 
@@ -42,33 +43,36 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
         },
       ]}
     >
-      <View style={styles.tabBar}>
-        {routes.map((route, i) => {
-          const isActive = index === i
-          return (
-            <Pressable
-              key={i}
-              style={[
-                styles.tabItem,
-                {
-                  borderColor: isActive ? Colors[theme].text : 'transparent',
-                },
-              ]}
-              onPress={() => {
-                pagerRef.current?.setPage(i)
-              }}
-            >
-              <Animated.Text
+      <View style={styles.tabWrap}>
+        <View style={styles.tabBar}>
+          {routes.map((route, i) => {
+            const isActive = index === i
+            return (
+              <Pressable
+                key={i}
                 style={[
-                  styles.heading,
-                  { opacity: isActive ? 1 : 0.5, color: Colors[theme].text },
+                  styles.tabItem,
+                  {
+                    borderColor: isActive ? Colors[theme].text : 'transparent',
+                  },
                 ]}
+                onPress={() => {
+                  pagerRef.current?.setPage(i)
+                }}
               >
-                {route.title}
-              </Animated.Text>
-            </Pressable>
-          )
-        })}
+                <Animated.Text
+                  style={[
+                    styles.heading,
+                    { opacity: isActive ? 1 : 0.5, color: Colors[theme].text },
+                  ]}
+                >
+                  {route.title}
+                </Animated.Text>
+              </Pressable>
+            )
+          })}
+        </View>
+        <UserCircleAlt width={32} height={32} color="#999" />
       </View>
       <PagerView
         ref={pagerRef}
@@ -85,6 +89,18 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
           <GlobalFeed />
         </View>
       </PagerView>
+      <View
+        style={{
+          position: 'absolute',
+          backgroundColor: Colors.yellow,
+          padding: 10,
+          right: 10,
+          bottom: 10,
+          borderRadius: 25,
+        }}
+      >
+        <EditPencil width={30} height={30} strokeWidth={2} color="#000" />
+      </View>
     </View>
   )
 }
@@ -109,5 +125,11 @@ const styles = StyleSheet.create({
   },
   pagerView: {
     flex: 1,
+  },
+  tabWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 10,
   },
 })

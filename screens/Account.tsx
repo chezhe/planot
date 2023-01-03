@@ -8,6 +8,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Event } from 'nostr-tools'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useRoute } from '@react-navigation/native'
+import Post from 'components/Post'
 
 dayjs.extend(relativeTime)
 
@@ -17,6 +19,8 @@ export default function Account({
   const [profile, setProfile] = useState<Profile>()
   const [posts, setPosts] = useState<Event[]>()
 
+  const { params } = useRoute()
+  const pubkey = (params as any).pubkey as string
   const insets = useSafeAreaInsets()
 
   useEffect(() => {
@@ -24,47 +28,37 @@ export default function Account({
       try {
         const service = new Relayer()
 
-        setTimeout(() => {
-          service
-            .getProfile(
-              'fd526aaff431de56fdd52688d88ca65d27ae547e686b21fda4b2d1177cefb4f4'
-            )
-            .then((res) => {
-              setProfile(res)
-            })
-            .catch(console.error)
-          service
-            .getPostsByAuthor(
-              'fd526aaff431de56fdd52688d88ca65d27ae547e686b21fda4b2d1177cefb4f4'
-            )
-            .then((res) => {
-              setPosts(res)
-            })
-            .catch(console.error)
-          service
-            .getFollowedByAuthor(
-              'fd526aaff431de56fdd52688d88ca65d27ae547e686b21fda4b2d1177cefb4f4'
-            )
-            .then((res) => {
-              // console.log('following', res)
-            })
-            .catch(console.error)
-        }, 10000)
+        service
+          .getProfile(pubkey)
+          .then((res) => {
+            setProfile(res)
+          })
+          .catch(console.error)
+        service
+          .getPostsByAuthor(pubkey)
+          .then((res) => {
+            setPosts(res)
+          })
+          .catch(console.error)
+        service
+          .getFollowedByAuthor(pubkey)
+          .then((res) => {
+            // console.log('following', res)
+          })
+          .catch(console.error)
       } catch (error) {
         console.log('error', error)
       }
     }
 
     initRelay()
-  }, [])
-
-  console.log('posts', posts);
-  
+  }, [pubkey])
 
   return (
     <FlatList
       data={(posts || []).sort((a, b) => b.created_at - a.created_at)}
       keyExtractor={({ id, sig }) => id!}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
       ListHeaderComponent={() => (
         <View
           style={[
@@ -87,37 +81,7 @@ export default function Account({
         </View>
       )}
       renderItem={({ item }) => {
-        return (
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              width: '100%',
-              borderBottomColor: '#999',
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            }}
-          >
-            <Image source={{ uri: profile?.picture }} style={styles.pavatar} />
-
-            <View style={{ paddingLeft: 8, paddingTop: 2 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {profile?.name}
-                </Text>
-                <Text style={{ color: '#999', marginLeft: 8 }}>
-                  {dayjs(item.created_at * 1000).fromNow()}
-                </Text>
-              </View>
-              <Text style={styles.post}>{item.content}</Text>
-            </View>
-          </View>
-        )
+        return <Post post={item} profile={profile} />
       }}
     />
   )
