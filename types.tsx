@@ -62,3 +62,9 @@ export type PreviewOfURL = {
   }[]
   favicons: string[]
 }
+
+export enum ButtonType {
+  DEFAULT = 'default',
+  PRIMARY = 'primary',
+  DANGER = 'danger',
+}

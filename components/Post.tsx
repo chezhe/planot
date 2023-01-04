@@ -14,13 +14,17 @@ import Preview from './Preview'
 import Content from './Content'
 import { useNavigation } from '@react-navigation/native'
 import PostBar from './PostBar'
+import Colors from 'theme/Colors'
+import useColorScheme from 'hooks/useColorScheme'
 
 export default function Post({
   post,
   profile,
+  notFetchProfile,
 }: {
   post: Event
   profile?: Profile
+  notFetchProfile?: boolean
 }) {
   const [iprofile, setIProfile] = useState(profile)
   const [preview, setPreview] = useState<PreviewOfURL>()
@@ -29,6 +33,7 @@ export default function Post({
   const dispatch = useAppDispatch()
   const { width } = useWindowDimensions()
   const navigation = useNavigation()
+  const theme = useColorScheme()
 
   useEffect(() => {
     if (profile) {
@@ -39,19 +44,21 @@ export default function Post({
       async function initRelay() {
         try {
           const service = new Relayer()
-          service
-            .getProfile(post.pubkey)
-            .then((res) => {
-              dispatch({
-                type: 'profiles/addProfile',
-                payload: {
-                  id: post.pubkey,
-                  profile: res,
-                },
+          if (!notFetchProfile) {
+            service
+              .getProfile(post.pubkey)
+              .then((res) => {
+                dispatch({
+                  type: 'profiles/addProfile',
+                  payload: {
+                    id: post.pubkey,
+                    profile: res,
+                  },
+                })
+                setIProfile(res)
               })
-              setIProfile(res)
-            })
-            .catch(() => {})
+              .catch(() => {})
+          }
         } catch (error) {
           console.log('error', error)
         }
@@ -77,7 +84,7 @@ export default function Post({
         flexDirection: 'row',
         paddingHorizontal: 20,
         paddingVertical: 20,
-        borderBottomColor: '#999',
+        borderBottomColor: Colors[theme].borderColor,
         borderBottomWidth: StyleSheet.hairlineWidth,
       }}
     >

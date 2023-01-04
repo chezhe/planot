@@ -71,7 +71,15 @@ export default function Preview({
                 {preview.title}
               </Text>
             </View>
-            <Text style={styles.previewDesc} numberOfLines={2}>
+            <Text
+              style={[
+                styles.previewDesc,
+                {
+                  marginBottom: 10,
+                },
+              ]}
+              numberOfLines={2}
+            >
               {preview.description}
             </Text>
             {preview.images && preview.images.length > 0 && (
