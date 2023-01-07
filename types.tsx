@@ -9,6 +9,7 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { ImageSourcePropType } from 'react-native'
 
 declare global {
   namespace ReactNavigation {
@@ -67,4 +68,26 @@ export enum ButtonType {
   DEFAULT = 'default',
   PRIMARY = 'primary',
   DANGER = 'danger',
+}
+
+export type ToastType = 'success' | 'error' | 'info' | 'warning'
+
+export interface ToastPayload {
+  type: ToastType
+  message: string
+  icon?: ImageSourcePropType
+  duration: number
+}
+
+export enum PUB {
+  TOAST_MESSAGE = 'TOAST_MESSAGE',
+  TOAST_HIDE = 'TOAST_HIDE',
+}
+
+export interface SettingItem {
+  icon: any
+  title: string
+  value?: any
+  noChevron?: boolean
+  onPress: () => void
 }

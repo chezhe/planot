@@ -4,6 +4,7 @@ import {
   Message,
   Quote,
   RefreshDouble,
+  ShareIos,
 } from 'iconoir-react-native'
 import { Event } from 'nostr-tools'
 import { StyleSheet } from 'react-native'

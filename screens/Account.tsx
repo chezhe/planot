@@ -17,6 +17,12 @@ import Box from 'components/common/Box'
 import Button from 'components/common/Button'
 import Colors from 'theme/Colors'
 import useColorScheme from 'hooks/useColorScheme'
+import { CircleFade } from 'react-native-animated-spinkit'
+import ProfileHeader from 'components/ProfileHeader'
+import { NavArrowLeft } from 'iconoir-react-native'
+import { hasDynamicIsland } from 'utils'
+import Icon from 'components/common/Icon'
+import { BlurView } from 'expo-blur'
 
 dayjs.extend(relativeTime)
 
@@ -25,6 +31,8 @@ export default function Account({
 }: RootStackScreenProps<'Account'>) {
   const [profile, setProfile] = useState<Profile>()
   const [posts, setPosts] = useState<Event[]>()
+  const [isLoading, setIsLoading] = useState(false)
+  const [offsetY, setOffsetY] = useState(0)
 
   const { params } = useRoute()
   const pubkey = (params as any).pubkey as string
@@ -56,12 +64,16 @@ export default function Account({
             })
             .catch(console.error)
         }
+        setIsLoading(true)
         service
           .getPostsByAuthor(pubkey)
           .then((res) => {
             setPosts(res)
+            setIsLoading(false)
           })
-          .catch(console.error)
+          .catch(() => {
+            setIsLoading(false)
+          })
         // service
         //   .getFollowedByAuthor(pubkey)
         //   .then((res) => {
@@ -74,106 +86,78 @@ export default function Account({
     }
 
     initRelay()
-  }, [pubkey, profiles])
+  }, [pubkey])
 
-  console.log('profile', profile)
+  useEffect(() => {
+    const listener = scrollOffsetY.addListener(({ value }) => {
+      setOffsetY(value)
+    })
+    return () => {
+      scrollOffsetY.removeListener(listener)
+    }
+  }, [scrollOffsetY])
 
-  const maxOffsetY = 250
+  const backButton = (
+    <Icon
+      icon={
+        <NavArrowLeft
+          width={24}
+          height={24}
+          color={Colors[theme].screenBackground}
+          strokeWidth={2}
+        />
+      }
+      size={40}
+      style={{ marginBottom: hasDynamicIsland() ? 10 : 0, marginLeft: 20 }}
+      onPress={() => {
+        navigation.goBack()
+      }}
+    />
+  )
 
   return (
     <View style={{ flex: 1 }}>
-      <ScreenHeader title="Back" />
-      <Animated.View
-        style={[
-          {
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            flexDirection: 'column',
-            alignItems: 'center',
-            maxHeight: scrollOffsetY.interpolate({
-              inputRange: [0, maxOffsetY, maxOffsetY + 1],
-              outputRange: [maxOffsetY, 0, 0],
-              extrapolate: 'clamp',
-            }),
-          },
-        ]}
-      >
-        <Animated.Image
-          source={{ uri: profile?.picture }}
+      {offsetY > 100 ? (
+        <BlurView
+          intensity={60}
+          tint={theme}
           style={[
-            styles.avatar,
+            styles.back,
             {
-              transform: [
-                {
-                  scale: scrollOffsetY.interpolate({
-                    inputRange: [0, maxOffsetY, maxOffsetY + 1],
-                    outputRange: [1, 0.7, 0.7],
-                    extrapolate: 'clamp',
-                  }),
-                },
-                {
-                  translateY: scrollOffsetY.interpolate({
-                    inputRange: [0, maxOffsetY, maxOffsetY + 1],
-                    outputRange: [0, -100, -100],
-                    extrapolate: 'clamp',
-                  }),
-                },
-              ],
+              paddingTop: insets.top,
             },
           ]}
-        />
+        >
+          {backButton}
+        </BlurView>
+      ) : (
+        <Animated.View
+          style={[
+            styles.back,
+            {
+              paddingTop: insets.top,
+              backgroundColor: scrollOffsetY.interpolate({
+                inputRange: [0, 100],
+                outputRange: ['rgba(255,255,255,0)', 'rgba(220,220,220,0.95)'],
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
+        >
+          {backButton}
+        </Animated.View>
+      )}
 
-        <Box direction="column" align="center" justify="center" gap="small">
-          <Animated.Text
-            style={[
-              styles.title,
-              {
-                color: Colors[theme].text,
-                fontSize: scrollOffsetY.interpolate({
-                  inputRange: [0, maxOffsetY, maxOffsetY + 1],
-                  outputRange: [30, 20, 20],
-                  extrapolate: 'clamp',
-                }),
-                transform: [
-                  {
-                    translateY: scrollOffsetY.interpolate({
-                      inputRange: [0, maxOffsetY, maxOffsetY + 1],
-                      outputRange: [0, -20, -20],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            {profile?.name}
-          </Animated.Text>
-          <Text style={styles.about} numberOfLines={2}>
-            {profile?.about}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={[styles.follow]}>Following</Text>
-            <Text style={[styles.follow, { marginLeft: 20 }]}>Followers</Text>
-          </View>
-          <Button
-            label="Follow"
-            primary
-            size="small"
-            filled={false}
-            style={{ width: 100 }}
-            onPress={() => {}}
-          />
-        </Box>
-      </Animated.View>
       <FlatList
         data={(posts || []).sort((a, b) => b.created_at - a.created_at)}
+        ListHeaderComponent={
+          <ProfileHeader profile={profile} pubkey={pubkey} />
+        }
         keyExtractor={({ id, sig }) => id!}
-        style={{ flex: 1, backgroundColor: Colors[theme].background }}
+        style={{
+          flex: isLoading ? undefined : 1,
+          backgroundColor: Colors[theme].background,
+        }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
           { useNativeDriver: false }
@@ -183,6 +167,18 @@ export default function Account({
           return <Post post={item} profile={profile} notFetchProfile />
         }}
       />
+      {/* {isLoading && (
+        <View
+          style={{
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 50,
+          }}
+        >
+          <CircleFade size={100} color="#999" />
+        </View>
+      )} */}
     </View>
   )
 }
@@ -195,21 +191,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  follow: {
-    fontSize: 16,
-  },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-  },
-  title: {
-    fontSize: 30,
-    fontFamily: Fonts.heading,
-  },
-  about: {
-    fontSize: 16,
-    color: '#999',
+  back: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    zIndex: 1,
+    width: '100%',
   },
   separator: {
     marginVertical: 30,

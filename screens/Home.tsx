@@ -10,9 +10,10 @@ import Fonts from '../theme/Fonts'
 import Colors from '../theme/Colors'
 import useColorScheme from '../hooks/useColorScheme'
 import PagerView from 'react-native-pager-view'
-import Feed from '../components/Feed'
+import FollowingFeed from '../components/FollowingFeed'
 import GlobalFeed from '../components/GlobalFeed'
 import { EditPencil, UserCircleAlt } from 'iconoir-react-native'
+import Relayer from 'service'
 
 dayjs.extend(relativeTime)
 
@@ -22,7 +23,7 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
     { key: 'global', title: 'Global' },
   ]
 
-  const [index, setIndex] = useState(1)
+  const [index, setIndex] = useState(0)
   const pagerRef = useRef<PagerView>(null)
 
   const insets = useSafeAreaInsets()
@@ -33,6 +34,10 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
       setIndex(_index)
     }
   }
+
+  useEffect(() => {
+    new Relayer()
+  }, [])
 
   return (
     <View
@@ -83,7 +88,7 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
         }}
       >
         <View key="1">
-          <Feed />
+          <FollowingFeed />
         </View>
         <View key="2">
           <GlobalFeed />

@@ -84,9 +84,38 @@ export default class Relayer {
       )
       return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)
     } catch (error) {
-      console.log('error', error)
-
       return []
+    }
+  }
+
+  public async getPostById(id: string): Promise<Event | undefined> {
+    try {
+      const results = await Promise.all(
+        Relayer.relays.map((relay) => {
+          return new Promise((resolve, reject) => {
+            const sub = relay?.sub([
+              {
+                ids: [id],
+              },
+            ])
+
+            let post: Event
+            sub?.on('event', (event: Event) => {
+              post = event
+            })
+            sub?.on('eose', () => {
+              resolve(post)
+              sub?.unsub()
+            })
+            setTimeout(() => {
+              resolve(undefined)
+            }, 5000)
+          })
+        })
+      )
+      return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)[0]
+    } catch (error) {
+      return undefined
     }
   }
 
@@ -99,6 +128,41 @@ export default class Relayer {
               {
                 authors: [address],
                 // kinds: [3],
+              },
+            ])
+
+            const posts: Event[] = []
+            sub?.on('event', (event: Event) => {
+              posts.push(event)
+            })
+            sub?.on('eose', () => {
+              resolve(posts)
+              sub?.unsub()
+            })
+            setTimeout(() => {
+              resolve([])
+            }, 5000)
+          })
+        })
+      )
+      return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)
+    } catch (error) {
+      return []
+    }
+  }
+
+  public async getFollowingFeed(addresses: string[]): Promise<Event[]> {
+    try {
+      const results = await Promise.all(
+        Relayer.relays.map((relay) => {
+          return new Promise((resolve, reject) => {
+            const sub = relay?.sub([
+              {
+                authors: [
+                  '32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245',
+                ],
+                kinds: [1, 2],
+                limit: 20,
               },
             ])
 

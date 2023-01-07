@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
@@ -11,6 +12,7 @@ import * as WebBrowser from 'expo-web-browser'
 import useColorScheme from 'hooks/useColorScheme'
 import Fonts from 'theme/Fonts'
 import { useEffect, useState } from 'react'
+import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av'
 
 export default function Preview({
   preview,
@@ -32,12 +34,58 @@ export default function Preview({
         }
       })
     }
-  }, [preview])
+  }, [preview?.mediaType])
 
   if (!preview) {
     return null
   }
 
+  let digest = null
+  if (preview && preview.contentType === 'text/html') {
+    const withImage = preview.images && preview.images.length > 0
+    digest = (
+      <View
+        style={{
+          backgroundColor: Colors[theme].bannerBackground,
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          borderBottomLeftRadius: 8,
+          borderBottomRightRadius: 8,
+          paddingTop: 10,
+          borderRadius: withImage ? undefined : 8,
+        }}
+      >
+        <View style={styles.row}>
+          {preview.favicons && preview.favicons.length > 0 && (
+            <Favicon favicons={preview.favicons} />
+          )}
+          <Text
+            style={[
+              styles.previewTitle,
+              {
+                maxWidth: contentWidth - 50,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            {preview.title}
+          </Text>
+        </View>
+        <Text
+          style={[
+            styles.previewDesc,
+            {
+              marginBottom: 10,
+            },
+          ]}
+          numberOfLines={2}
+        >
+          {preview.description}
+        </Text>
+      </View>
+    )
+  }
   return (
     <>
       {preview && preview.contentType === 'text/html' && (
@@ -45,51 +93,18 @@ export default function Preview({
           activeOpacity={0.7}
           onPress={() => WebBrowser.openBrowserAsync(preview.url)}
         >
-          <View
-            style={[
-              styles.previewWrap,
-              {
-                backgroundColor: Colors[theme].background,
-                borderColor: Colors[theme].borderColor,
-                width: contentWidth,
-              },
-            ]}
-          >
-            <View style={styles.row}>
-              {preview.favicons && preview.favicons.length > 0 && (
-                <Favicon favicons={preview.favicons} />
-              )}
-              <Text
-                style={[
-                  styles.previewTitle,
-                  {
-                    maxWidth: contentWidth - 50,
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                {preview.title}
-              </Text>
-            </View>
-            <Text
-              style={[
-                styles.previewDesc,
-                {
-                  marginBottom: 10,
-                },
-              ]}
-              numberOfLines={2}
+          {preview.images && preview.images.length > 0 ? (
+            <ImageBackground
+              source={{ uri: preview.images[0] }}
+              style={[styles.previewImage, { width: contentWidth - 2 }]}
+              resizeMode="cover"
+              imageStyle={{ borderRadius: 8 }}
             >
-              {preview.description}
-            </Text>
-            {preview.images && preview.images.length > 0 && (
-              <Image
-                source={{ uri: preview.images[0] }}
-                style={[styles.previewImage, { width: contentWidth - 2 }]}
-                resizeMode="cover"
-              />
-            )}
-          </View>
+              {digest}
+            </ImageBackground>
+          ) : (
+            digest
+          )}
         </TouchableOpacity>
       )}
       {preview && preview.mediaType === 'image' && (
@@ -100,6 +115,18 @@ export default function Preview({
             { width: contentWidth - 2, height: imageHeight },
           ]}
           resizeMode="cover"
+        />
+      )}
+      {preview && preview.mediaType === 'video' && (
+        <Video
+          style={{ width: contentWidth - 2 }}
+          source={{
+            uri: preview.url,
+          }}
+          useNativeControls
+          resizeMode={ResizeMode.CONTAIN}
+          isLooping
+          onPlaybackStatusUpdate={(status) => {}}
         />
       )}
     </>
@@ -156,9 +183,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   previewImage: {
-    height: 100,
+    height: 160,
     marginTop: 8,
-    borderBottomLeftRadius: 9,
-    borderBottomRightRadius: 9,
   },
 })

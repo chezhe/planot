@@ -1,12 +1,12 @@
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
-import Relayer from 'service'
 import { CircleFade } from 'react-native-animated-spinkit'
+import Relayer from 'service'
 import Post from './Post'
 import { Text, View } from './Themed'
 
-export default function GlobalFeed() {
+export default function FollowingFeed() {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +18,7 @@ export default function GlobalFeed() {
         setTimeout(() => {
           const service = new Relayer()
           service
-            .getGlobalFeed()
+            .getFollowingFeed([])
             .then((res) => {
               setIsLoading(false)
               setPosts(res)
@@ -32,6 +32,7 @@ export default function GlobalFeed() {
 
     init()
   }, [])
+  console.log('posts', posts.length)
 
   if (isLoading) {
     return (

@@ -8,6 +8,7 @@ import useCachedResources from './hooks/useCachedResources'
 import Navigation from './navigation'
 import { store, persistor } from './store/index'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import ToastMessage from 'components/common/ToastMessage'
 
 export default function App() {
   const isLoadingComplete = useCachedResources()
@@ -22,6 +23,7 @@ export default function App() {
             <SafeAreaProvider>
               <Navigation />
               <StatusBar />
+              <ToastMessage />
             </SafeAreaProvider>
           </PersistGate>
         </Provider>

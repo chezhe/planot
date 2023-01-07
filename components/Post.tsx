@@ -34,6 +34,7 @@ export default function Post({
   const { width } = useWindowDimensions()
   const navigation = useNavigation()
   const theme = useColorScheme()
+  // console.log('post', post)
 
   useEffect(() => {
     if (profile) {
@@ -65,15 +66,33 @@ export default function Post({
       }
       initRelay()
     }
-  }, [iprofile, profiles])
+  }, [profile])
 
   useEffect(() => {
     getLinkPreview(post.content)
       .then((data) => {
-        console.log(data)
         setPreview(data)
       })
-      .catch(console.error)
+      .catch(() => {})
+
+    // async function fetchContext(pid: string) {
+    //   console.log('pid', pid)
+
+    //   try {
+    //     const service = new Relayer()
+    //     const repliedPost = await service.getPostById(pid)
+    //     console.log('repliedPost', repliedPost)
+    //   } catch (error) {
+    //     console.log('error', error)
+    //   }
+    // }
+
+    // const tags = post.tags
+    // if (tags.some((tag) => tag[0] === 'p')) {
+    //   const ptags = tags.filter((tag) => tag[0] === 'p')
+    //   const pid = ptags[0][1]
+    //   fetchContext(pid)
+    // }
   }, [post])
 
   const contentWidth = width - 20 - 50 - 8 - 20

@@ -1,6 +1,19 @@
-export const ellipsis = (str: string, length: number) => {
-  if (str.length > length) {
-    return str.slice(0, length) + '...'
+import * as Device from 'expo-device'
+
+export function ellipsis(
+  str: string | undefined,
+  head: number,
+  tail: number = 0
+) {
+  if (!str) {
+    return ''
   }
-  return str
+  if (str.length <= head + tail) {
+    return str
+  }
+  return str.slice(0, head) + '...' + str.slice(-tail)
+}
+
+export const hasDynamicIsland = () => {
+  return ['iPhone15,2', 'iPhone15,3'].includes(Device.modelId)
 }
