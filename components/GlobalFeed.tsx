@@ -1,12 +1,18 @@
 import { Event } from 'nostr-tools'
-import { useEffect, useState } from 'react'
-import { FlatList } from 'react-native'
+import { RefObject, useEffect, useState, forwardRef } from 'react'
+import { FlatList, Image } from 'react-native'
 import Relayer from 'service'
 import { CircleFade } from 'react-native-animated-spinkit'
 import Post from './Post'
 import { Text, View } from './Themed'
+import ListEmpty from './common/LisstEmpty'
+import Toast from 'utils/toast'
 
-export default function GlobalFeed() {
+interface Props {
+  ref: RefObject<FlatList>
+}
+
+const GlobalFeed = forwardRef<FlatList, Props>((props, ref) => {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -23,8 +29,9 @@ export default function GlobalFeed() {
               setIsLoading(false)
               setPosts(res)
             })
-            .catch(() => {
+            .catch((err) => {
               setIsLoading(false)
+              Toast.error(err)
             })
         }, 10000)
       } catch (error) {}
@@ -33,27 +40,18 @@ export default function GlobalFeed() {
     init()
   }, [])
 
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 50,
-        }}
-      >
-        <CircleFade size={100} color="#999" />
-      </View>
-    )
-  }
-
   return (
     <FlatList
+      ref={ref}
       data={posts}
       renderItem={({ item }) => {
         return <Post post={item} />
       }}
+      ListEmptyComponent={
+        <ListEmpty isLoading={isLoading} title="No posts yet" />
+      }
     />
   )
-}
+})
+
+export default GlobalFeed

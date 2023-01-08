@@ -1,12 +1,17 @@
 import { Event } from 'nostr-tools'
-import { useEffect, useState } from 'react'
+import { RefObject, useEffect, useState, forwardRef } from 'react'
 import { FlatList } from 'react-native'
 import { CircleFade } from 'react-native-animated-spinkit'
 import Relayer from 'service'
+import ListEmpty from './common/LisstEmpty'
 import Post from './Post'
-import { Text, View } from './Themed'
+import { View } from './Themed'
 
-export default function FollowingFeed() {
+interface Props {
+  ref: RefObject<FlatList>
+}
+
+const FollowingFeed = forwardRef<FlatList, Props>((props, ref) => {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -32,29 +37,19 @@ export default function FollowingFeed() {
 
     init()
   }, [])
-  console.log('posts', posts.length)
-
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 50,
-        }}
-      >
-        <CircleFade size={100} color="#999" />
-      </View>
-    )
-  }
 
   return (
     <FlatList
+      ref={ref}
       data={posts}
       renderItem={({ item }) => {
         return <Post post={item} />
       }}
+      ListEmptyComponent={
+        <ListEmpty isLoading={isLoading} title="No posts yet" />
+      }
     />
   )
-}
+})
+
+export default FollowingFeed

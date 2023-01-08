@@ -31,10 +31,13 @@ import {
   MailOpened,
   Home as HomeEmpty,
   Settings,
+  SendMail,
 } from 'iconoir-react-native'
 import Account from '../screens/Account'
 import Messages from '../screens/Messages'
 import HashTag from 'screens/HashTag'
+import AccountEdit from 'screens/AccountEdit'
+import Note from 'screens/Note'
 
 export default function Navigation() {
   const colorScheme = useColorScheme()
@@ -71,11 +74,21 @@ function RootNavigator() {
       <Stack.Screen
         name="HashTag"
         component={HashTag}
-        options={{ title: 'Oops!' }}
+        options={{ header: () => null }}
       />
       <Stack.Screen
         name="Account"
         component={Account}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="AccountEdit"
+        component={AccountEdit}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="Note"
+        component={Note}
         options={{ header: () => null }}
       />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
@@ -137,7 +150,7 @@ function BottomTabNavigator() {
               focused: boolean
             }) => {
               return focused ? (
-                <MailOpened width={30} height={30} strokeWidth={1} />
+                <SendMail width={30} height={30} strokeWidth={1} />
               ) : (
                 <Mail width={30} height={30} strokeWidth={1} />
               )

@@ -1,18 +1,23 @@
-import { StyleSheet } from 'react-native'
-
-import EditScreenInfo from '../components/EditScreenInfo'
-import { Text, View } from '../components/Themed'
+import ListEmpty from 'components/common/LisstEmpty'
+import ScreenHeader from 'components/common/ScreenHeader'
+import { useState } from 'react'
+import { FlatList, StyleSheet } from 'react-native'
+import { View } from '../components/Themed'
 
 export default function Messages() {
+  const [isLoading, setIsLoading] = useState(false)
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
+      <ScreenHeader title="Messages" isBackable={false} />
+      <FlatList
+        data={[]}
+        renderItem={() => {
+          return null
+        }}
+        ListEmptyComponent={
+          <ListEmpty isLoading={isLoading} title="No messages yet" />
+        }
       />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
     </View>
   )
 }
@@ -20,16 +25,6 @@ export default function Messages() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
+  contentContainer: {},
 })

@@ -1,18 +1,46 @@
-import { StyleSheet } from 'react-native'
+import ScreenHeader from 'components/common/ScreenHeader'
+import SettingBlock from 'components/common/SettingBlock'
+import { Brightness, ProfileCircled, Server } from 'iconoir-react-native'
+import { ScrollView, StyleSheet } from 'react-native'
+import { RootTabScreenProps } from 'types'
+import { View } from '../components/Themed'
 
-import EditScreenInfo from '../components/EditScreenInfo'
-import { Text, View } from '../components/Themed'
-
-export default function Settings() {
+export default function Settings({
+  navigation,
+}: RootTabScreenProps<'Settings'>) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+      <ScreenHeader title="Settings" isBackable={false} />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <SettingBlock
+          title="Account"
+          items={[
+            {
+              icon: ProfileCircled,
+              title: 'Account',
+              value: '',
+              onPress: () => {
+                navigation.navigate('AccountEdit')
+              },
+            },
+            {
+              icon: Server,
+              title: 'Relays',
+              value: '',
+              onPress: () => {},
+            },
+            {
+              icon: Brightness,
+              title: 'Display',
+              value: '',
+              onPress: () => {},
+            },
+          ]}
+        />
+      </ScrollView>
     </View>
   )
 }
@@ -20,16 +48,9 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 50,
   },
 })

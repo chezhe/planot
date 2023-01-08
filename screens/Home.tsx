@@ -1,4 +1,4 @@
-import { Animated, Pressable, StyleSheet } from 'react-native'
+import { Animated, FlatList, Image, Pressable, StyleSheet } from 'react-native'
 
 import { Text, View } from '../components/Themed'
 import { RootTabScreenProps } from '../types'
@@ -14,6 +14,9 @@ import FollowingFeed from '../components/FollowingFeed'
 import GlobalFeed from '../components/GlobalFeed'
 import { EditPencil, UserCircleAlt } from 'iconoir-react-native'
 import Relayer from 'service'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import Toast from 'utils/toast'
+import { useScrollToTop } from '@react-navigation/native'
 
 dayjs.extend(relativeTime)
 
@@ -25,9 +28,46 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
 
   const [index, setIndex] = useState(0)
   const pagerRef = useRef<PagerView>(null)
+  const followListRef = useRef<FlatList>(null)
+  const globalListRef = useRef<FlatList>(null)
 
   const insets = useSafeAreaInsets()
   const theme = useColorScheme()
+  const dispatch = useAppDispatch()
+
+  const { pubkey } = useAppSelector((state) => state.account)
+  const profiles = useAppSelector((state) => state.profile)
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const service = new Relayer()
+        setTimeout(() => {
+          service
+            .getProfile(pubkey)
+            .then((res) => {
+              console.log('fetching profile', res)
+
+              dispatch({
+                type: 'profiles/addProfile',
+                payload: {
+                  id: pubkey,
+                  profile: res,
+                },
+              })
+            })
+            .catch(() => Toast.error('Failed to fetch profile'))
+        }, 3000)
+      } catch (error) {
+        console.log('error', error)
+      }
+    }
+    if (!pubkey) {
+      // navigate register screen
+    } else if (!profiles[pubkey]) {
+      fetchProfile()
+    }
+  }, [pubkey])
 
   const onTabChange = (_index: number) => {
     if (_index !== index) {
@@ -38,6 +78,9 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
   useEffect(() => {
     new Relayer()
   }, [])
+
+  useScrollToTop(followListRef)
+  useScrollToTop(globalListRef)
 
   return (
     <View
@@ -77,7 +120,16 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
             )
           })}
         </View>
-        <UserCircleAlt width={32} height={32} color="#999" />
+        <Pressable onPress={() => navigation.navigate('Account', { pubkey })}>
+          <Image
+            source={
+              profiles[pubkey]
+                ? { uri: profiles[pubkey].picture }
+                : require('../assets/images/default-avatar.png')
+            }
+            style={{ width: 32, height: 32, borderRadius: 16 }}
+          />
+        </Pressable>
       </View>
       <PagerView
         ref={pagerRef}
@@ -88,10 +140,10 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
         }}
       >
         <View key="1">
-          <FollowingFeed />
+          <FollowingFeed ref={followListRef} />
         </View>
         <View key="2">
-          <GlobalFeed />
+          <GlobalFeed ref={globalListRef} />
         </View>
       </PagerView>
       <View
@@ -135,6 +187,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingRight: 10,
+    paddingRight: 18,
   },
 })

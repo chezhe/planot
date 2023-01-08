@@ -16,6 +16,7 @@ export default class Relayer {
       'wss://nostr-pub.wellorder.net',
       'wss://relay.damus.io',
       'wss://relay.nostr.ch',
+      'wss://nostr.zebedee.cloud',
     ] // , 'wss://nostr.oxtr.dev', 'wss://nostr-relay.wlvs.space', 'wss://nostr.fmt.wiz.biz'
     for (const node of nodes) {
       const relay = relayInit(node)
@@ -99,21 +100,23 @@ export default class Relayer {
               },
             ])
 
-            let post: Event
             sub?.on('event', (event: Event) => {
-              post = event
+              resolve(event)
             })
             sub?.on('eose', () => {
-              resolve(post)
               sub?.unsub()
             })
             setTimeout(() => {
               resolve(undefined)
-            }, 5000)
+            }, 15000)
           })
         })
       )
-      return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)[0]
+
+      return _.uniqBy(
+        results.filter((t) => t) as Event[],
+        (t: Event) => t.id
+      )[0]
     } catch (error) {
       return undefined
     }
@@ -162,7 +165,7 @@ export default class Relayer {
                   '32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245',
                 ],
                 kinds: [1, 2],
-                limit: 20,
+                limit: 10,
               },
             ])
 
@@ -195,7 +198,7 @@ export default class Relayer {
               {
                 kinds: [1],
                 since: 0,
-                limit: 20,
+                limit: 10,
               },
             ])
 
@@ -213,6 +216,42 @@ export default class Relayer {
           })
         })
       )
+      return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)
+    } catch (error) {
+      return []
+    }
+  }
+
+  public async getNotesByHashTag(hashTag: string): Promise<Event[]> {
+    try {
+      const results = await Promise.all(
+        Relayer.relays.map((relay) => {
+          return new Promise((resolve, reject) => {
+            const sub = relay?.sub([
+              {
+                kinds: [1],
+                '#t': [`'["t","${hashTag}"]'`],
+                limit: 10,
+              },
+            ])
+
+            const posts: Event[] = []
+            sub?.on('event', (event: Event) => {
+              posts.push(event)
+            })
+            sub?.on('eose', () => {
+              console.log('getNotesByHashTag.eose')
+              resolve(posts)
+              sub?.unsub()
+            })
+            setTimeout(() => {
+              resolve([])
+            }, 5000)
+          })
+        })
+      )
+      console.log('results', results)
+
       return _.uniqBy(_.flatten(results) as Event[], (t: Event) => t.id)
     } catch (error) {
       return []

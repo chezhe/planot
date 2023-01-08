@@ -9,6 +9,7 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Event } from 'nostr-tools'
 import { ImageSourcePropType } from 'react-native'
 
 declare global {
@@ -22,6 +23,8 @@ export type RootStackParamList = {
   Account: { pubkey: string }
   HashTag: { tag: string }
   Modal: undefined
+  Note: { note: Event }
+  AccountEdit: undefined
   NotFound: undefined
 }
 

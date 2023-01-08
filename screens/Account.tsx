@@ -1,6 +1,6 @@
 import { Animated, FlatList, Image, StyleSheet } from 'react-native'
 
-import { Text, View } from '../components/Themed'
+import { View } from '../components/Themed'
 import { Profile, RootStackScreenProps } from '../types'
 import { useEffect, useRef, useState } from 'react'
 import Relayer from '../service'
@@ -10,19 +10,16 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute } from '@react-navigation/native'
 import Post from 'components/Post'
-import ScreenHeader from 'components/common/ScreenHeader'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
-import Fonts from 'theme/Fonts'
-import Box from 'components/common/Box'
-import Button from 'components/common/Button'
 import Colors from 'theme/Colors'
 import useColorScheme from 'hooks/useColorScheme'
-import { CircleFade } from 'react-native-animated-spinkit'
 import ProfileHeader from 'components/ProfileHeader'
 import { NavArrowLeft } from 'iconoir-react-native'
 import { hasDynamicIsland } from 'utils'
 import Icon from 'components/common/Icon'
 import { BlurView } from 'expo-blur'
+import { CircleFade } from 'react-native-animated-spinkit'
+import ListEmpty from 'components/common/LisstEmpty'
 
 dayjs.extend(relativeTime)
 
@@ -166,19 +163,10 @@ export default function Account({
         renderItem={({ item }) => {
           return <Post post={item} profile={profile} notFetchProfile />
         }}
+        ListEmptyComponent={
+          <ListEmpty isLoading={isLoading} title="No posts yet" />
+        }
       />
-      {/* {isLoading && (
-        <View
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 50,
-          }}
-        >
-          <CircleFade size={100} color="#999" />
-        </View>
-      )} */}
     </View>
   )
 }

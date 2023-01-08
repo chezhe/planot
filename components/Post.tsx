@@ -21,13 +21,16 @@ export default function Post({
   post,
   profile,
   notFetchProfile,
+  isRoot = true,
 }: {
   post: Event
   profile?: Profile
   notFetchProfile?: boolean
+  isRoot?: boolean
 }) {
   const [iprofile, setIProfile] = useState(profile)
   const [preview, setPreview] = useState<PreviewOfURL>()
+  const [repliedTo, setRepliedTo] = useState<Event>()
 
   const profiles = useAppSelector((state) => state.profile)
   const dispatch = useAppDispatch()
@@ -75,81 +78,130 @@ export default function Post({
       })
       .catch(() => {})
 
-    // async function fetchContext(pid: string) {
-    //   console.log('pid', pid)
+    async function fetchContext(id: string) {
+      try {
+        const service = new Relayer()
+        const repliedPost = await service.getPostById(id)
 
-    //   try {
-    //     const service = new Relayer()
-    //     const repliedPost = await service.getPostById(pid)
-    //     console.log('repliedPost', repliedPost)
-    //   } catch (error) {
-    //     console.log('error', error)
-    //   }
-    // }
+        setRepliedTo(repliedPost)
+      } catch (error) {
+        console.log('error', error)
+      }
+    }
 
-    // const tags = post.tags
-    // if (tags.some((tag) => tag[0] === 'p')) {
-    //   const ptags = tags.filter((tag) => tag[0] === 'p')
-    //   const pid = ptags[0][1]
-    //   fetchContext(pid)
-    // }
-  }, [post])
+    if (isRoot) {
+      const tags = post.tags
+
+      if (
+        tags.some((tag) => tag[0] === 'e') &&
+        tags.some((tag) => tag[0] === 'p')
+      ) {
+        const etags = tags.filter((tag) => tag[0] === 'e')
+        const id = etags[0][1]
+        fetchContext(id)
+      }
+    }
+  }, [post, isRoot])
 
   const contentWidth = width - 20 - 50 - 8 - 20
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-        borderBottomColor: Colors[theme].borderColor,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-      }}
-    >
-      <Pressable
-        onPress={() => navigation.navigate('Account', { pubkey: post.pubkey })}
-      >
-        <Image
-          source={
-            iprofile?.picture
-              ? { uri: iprofile?.picture }
-              : require('../assets/images/default-avatar.png')
-          }
-          style={styles.pavatar}
-        />
-      </Pressable>
-
-      <View style={{ paddingLeft: 8, paddingTop: 2 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontFamily: Fonts.heading,
-            }}
-          >
-            {iprofile?.name || ellipsis(post.pubkey, 10)}
-          </Text>
-          <Text style={{ color: '#999', marginLeft: 8 }}>
-            {dayjs(post.created_at * 1000).fromNow()}
-          </Text>
-        </View>
-        {preview && preview.url === post.content ? null : (
-          <Text
-            style={[
-              styles.post,
-              {
-                width: contentWidth,
+    <Pressable onPress={() => navigation.navigate('Note', { note: post })}>
+      <View
+        style={[
+          {
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            padding: 20,
+          },
+          isRoot
+            ? {
+                borderBottomColor: Colors[theme].borderColor,
+                borderBottomWidth: StyleSheet.hairlineWidth,
+              }
+            : {
+                borderColor: Colors[theme].borderColor,
+                borderWidth: 1,
+                borderRadius: 8,
+                marginTop: 10,
+                paddingVertical: 4,
+                paddingHorizontal: 0,
               },
-            ]}
+        ]}
+      >
+        {isRoot && (
+          <Pressable
+            onPress={() =>
+              navigation.navigate('Account', { pubkey: post.pubkey })
+            }
           >
-            <Content content={post.content} />
-          </Text>
+            <Image
+              source={
+                iprofile?.picture
+                  ? { uri: iprofile?.picture }
+                  : require('../assets/images/default-avatar.png')
+              }
+              style={styles.pavatar}
+            />
+          </Pressable>
         )}
-        <Preview preview={preview} />
-        <PostBar post={post} />
+
+        <View style={{ paddingLeft: 8, paddingTop: 2 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {!isRoot && (
+              <Pressable
+                onPress={() =>
+                  navigation.navigate('Account', { pubkey: post.pubkey })
+                }
+              >
+                <Image
+                  source={
+                    iprofile?.picture
+                      ? { uri: iprofile?.picture }
+                      : require('../assets/images/default-avatar.png')
+                  }
+                  style={[
+                    styles.pavatar,
+                    {
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      marginRight: 10,
+                    },
+                  ]}
+                />
+              </Pressable>
+            )}
+            <Text
+              style={{
+                fontSize: 18,
+                fontFamily: Fonts.heading,
+              }}
+            >
+              {iprofile?.name || ellipsis(post.pubkey, 6, 6)}
+            </Text>
+            <Text style={{ color: '#999', marginLeft: 8 }}>
+              {dayjs(post.created_at * 1000).fromNow()}
+            </Text>
+          </View>
+          {preview && preview.url === post.content ? null : (
+            <Text
+              style={[
+                styles.post,
+                {
+                  width: contentWidth - (isRoot ? 0 : 20),
+                },
+              ]}
+            >
+              <Content content={post.content} />
+            </Text>
+          )}
+          <Preview preview={preview} isRoot={isRoot} />
+          {repliedTo && <Post post={repliedTo} isRoot={false} />}
+          {isRoot && <PostBar post={post} />}
+        </View>
       </View>
-    </View>
+    </Pressable>
   )
 }
 

@@ -1,8 +1,7 @@
 import useColorScheme from 'hooks/useColorScheme'
-import { Check, Copy, Flash, MessageText, SendMail } from 'iconoir-react-native'
+import { Check, Copy, Flash, SendMail } from 'iconoir-react-native'
 import {
   Animated,
-  Image,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -19,6 +18,8 @@ import * as Clipboard from 'expo-clipboard'
 import Icon from './common/Icon'
 import { useState } from 'react'
 import Toast from 'utils/toast'
+import { useAppSelector } from 'store/hooks'
+import { NavigationState, useNavigation } from '@react-navigation/native'
 
 export default function ProfileHeader({
   profile,
@@ -30,6 +31,9 @@ export default function ProfileHeader({
   const [isCopying, setIsCopying] = useState(false)
   const theme = useColorScheme()
   const { width } = useWindowDimensions()
+  const { pubkey: ipubkey } = useAppSelector((state) => state.account)
+  const navigation = useNavigation()
+
   return (
     <Animated.View
       style={[
@@ -49,7 +53,11 @@ export default function ProfileHeader({
         resizeMode="cover"
       >
         <Animated.Image
-          source={{ uri: profile?.picture }}
+          source={
+            profile?.picture
+              ? { uri: profile?.picture }
+              : require('../assets/images/default-avatar.png')
+          }
           style={[
             styles.avatar,
             {
@@ -58,38 +66,56 @@ export default function ProfileHeader({
           ]}
         />
 
-        <Box direction="row" style={styles.followButton} gap="medium">
-          <Icon
-            icon={<Flash width={20} height={20} color={Colors.black} />}
-            style={styles.iconWrap}
-            backgroundColor={Colors.yellow}
-            size={32}
-            isTransparent
-            onPress={() => {}}
-          />
-          <Icon
-            icon={<SendMail width={20} height={20} color={Colors.white} />}
-            style={styles.iconWrap}
-            backgroundColor={Colors.link}
-            size={32}
-            isTransparent
-            onPress={() => {}}
-          />
-          <Button
-            label="Follow"
-            primary
-            size="small"
-            filled={false}
-            style={{ width: 100 }}
-            onPress={() => {}}
-          />
-        </Box>
+        {ipubkey !== pubkey ? (
+          <Box direction="row" style={styles.followButton} gap="medium">
+            <Icon
+              icon={<Flash width={20} height={20} color={Colors.black} />}
+              style={styles.iconWrap}
+              backgroundColor={Colors.yellow}
+              size={32}
+              isTransparent
+              onPress={() => {}}
+            />
+            <Icon
+              icon={<SendMail width={20} height={20} color={Colors.white} />}
+              style={styles.iconWrap}
+              backgroundColor={Colors.link}
+              size={32}
+              isTransparent
+              onPress={() => {}}
+            />
+            <Button
+              label="Follow"
+              primary
+              size="small"
+              filled={false}
+              style={{ width: 100 }}
+              onPress={() => {
+                navigation.navigate('AccountEdit')
+              }}
+            />
+          </Box>
+        ) : (
+          <Box direction="row" style={styles.followButton} gap="medium">
+            <Button
+              label="Edit"
+              primary={false}
+              size="small"
+              filled={false}
+              style={{ width: 100 }}
+              onPress={() => {
+                navigation.navigate('AccountEdit')
+              }}
+            />
+          </Box>
+        )}
       </ImageBackground>
 
       <Box
         direction="column"
         align="flex-start"
         justify="center"
+        gap="small"
         full
         style={{ paddingTop: 36 }}
       >

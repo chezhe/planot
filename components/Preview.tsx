@@ -12,17 +12,19 @@ import * as WebBrowser from 'expo-web-browser'
 import useColorScheme from 'hooks/useColorScheme'
 import Fonts from 'theme/Fonts'
 import { useEffect, useState } from 'react'
-import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av'
+import { Video, ResizeMode } from 'expo-av'
 
 export default function Preview({
   preview,
+  isRoot,
 }: {
   preview: PreviewOfURL | undefined
+  isRoot?: boolean
 }) {
   const theme = useColorScheme()
   const { width } = useWindowDimensions()
 
-  const contentWidth = width - 20 - 50 - 8 - 20
+  const contentWidth = width - 20 - 50 - 8 - 20 - 6
 
   const [imageHeight, setImageHeight] = useState<number>(contentWidth)
 

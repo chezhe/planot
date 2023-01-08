@@ -64,6 +64,8 @@ export default function Button({
         style,
       ]}
       onPress={() => {
+        console.log('onPress', isLoading, disabled)
+
         if (!isLoading && !disabled) {
           onPress()
         }

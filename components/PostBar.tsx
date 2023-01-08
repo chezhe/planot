@@ -30,7 +30,7 @@ export default function PostBar({ post }: { post: Event }) {
 const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
-    marginTop: 6,
+    marginTop: 10,
     borderTopColor: '#999',
   },
   item: {
