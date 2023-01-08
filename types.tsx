@@ -24,6 +24,9 @@ export type RootStackParamList = {
   HashTag: { tag: string }
   Modal: undefined
   Note: { note: Event }
+  Start: undefined
+  Login: undefined
+  SignUp: undefined
   AccountEdit: undefined
   NotFound: undefined
 }

@@ -76,11 +76,12 @@ export default function Content({ content }: { content: string }) {
       const tag = str.trim().split('#')[1]
       navigation.navigate('HashTag', { tag })
     } else if (pattern.name === 'mention') {
-      navigation.navigate('Account', { pubkey: str })
+      const pubkey = str.trim().split('@')[1]
+      navigation.navigate('Account', { pubkey })
     } else if (pattern.name === 'email') {
-      await Linking.openURL(`mailto:${str}`)
+      await Linking.openURL(`mailto:${str.trim()}`)
     } else if (pattern.name === 'url') {
-      await WebBrowser.openBrowserAsync(str)
+      await WebBrowser.openBrowserAsync(str.trim())
     }
   }
 

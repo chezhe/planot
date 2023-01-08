@@ -62,8 +62,10 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
         console.log('error', error)
       }
     }
-    if (!pubkey) {
+    // !pubkey
+    if (true) {
       // navigate register screen
+      navigation.navigate('Start')
     } else if (!profiles[pubkey]) {
       fetchProfile()
     }

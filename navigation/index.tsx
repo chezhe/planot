@@ -38,6 +38,9 @@ import Messages from '../screens/Messages'
 import HashTag from 'screens/HashTag'
 import AccountEdit from 'screens/AccountEdit'
 import Note from 'screens/Note'
+import Start from 'screens/Start'
+import SignUp from 'screens/SignUp'
+import Login from 'screens/Login'
 
 export default function Navigation() {
   const colorScheme = useColorScheme()
@@ -89,6 +92,21 @@ function RootNavigator() {
       <Stack.Screen
         name="Note"
         component={Note}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="Start"
+        component={Start}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="SignUp"
+        component={SignUp}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={Login}
         options={{ header: () => null }}
       />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>

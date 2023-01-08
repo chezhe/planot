@@ -19,7 +19,7 @@ import Icon from './common/Icon'
 import { useState } from 'react'
 import Toast from 'utils/toast'
 import { useAppSelector } from 'store/hooks'
-import { NavigationState, useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 
 export default function ProfileHeader({
   profile,
