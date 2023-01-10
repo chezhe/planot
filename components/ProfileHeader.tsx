@@ -1,5 +1,5 @@
 import useColorScheme from 'hooks/useColorScheme'
-import { Check, Copy, Flash, SendMail } from 'iconoir-react-native'
+import { Check, Copy, Flash, KeyAlt, SendMail } from 'iconoir-react-native'
 import {
   Animated,
   ImageBackground,
@@ -9,17 +9,19 @@ import {
 } from 'react-native'
 import Colors from 'theme/Colors'
 import Fonts from 'theme/Fonts'
-import { Profile } from 'types'
+import { Follow, Profile } from 'types'
 import { ellipsis } from 'utils'
 import Box from './common/Box'
 import Button from './common/Button'
 import { Text, View } from './Themed'
 import * as Clipboard from 'expo-clipboard'
 import Icon from './common/Icon'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Toast from 'utils/toast'
 import { useAppSelector } from 'store/hooks'
 import { useNavigation } from '@react-navigation/native'
+import Relayer from 'service'
+import Avatar from './common/Avatar'
 
 export default function ProfileHeader({
   profile,
@@ -28,11 +30,31 @@ export default function ProfileHeader({
   profile?: Profile
   pubkey?: string
 }) {
-  const [isCopying, setIsCopying] = useState(false)
+  const [following, setFollowing] = useState<Follow[]>([])
   const theme = useColorScheme()
   const { width } = useWindowDimensions()
-  const { pubkey: ipubkey } = useAppSelector((state) => state.account)
+  const { pubkey: ipubkey, following: ifollowing } = useAppSelector(
+    (state) => state.account
+  )
   const navigation = useNavigation()
+
+  useEffect(() => {
+    if (ipubkey === pubkey) {
+      setFollowing(ifollowing)
+    } else if (pubkey) {
+      const service = new Relayer()
+      service
+        .getFollowingByPubkey(pubkey)
+        .then((res) => {
+          setFollowing(res)
+        })
+        .catch(console.log)
+    }
+  }, [pubkey])
+
+  const isFollowed = ifollowing.some((t) => t.pubkey === pubkey)
+
+  const onToggleFollow = async () => {}
 
   return (
     <Animated.View
@@ -52,64 +74,55 @@ export default function ProfileHeader({
         style={{ width, height: 160 }}
         resizeMode="cover"
       >
-        <Animated.Image
-          source={
-            profile?.picture
-              ? { uri: profile?.picture }
-              : require('../assets/images/default-avatar.png')
-          }
-          style={[
-            styles.avatar,
-            {
-              borderColor: Colors[theme].background,
-            },
-          ]}
+        <Avatar
+          size={70}
+          pubkey={pubkey || ''}
+          src={profile?.picture}
+          style={{ ...styles.avatar, borderColor: Colors[theme].background }}
         />
-
-        {ipubkey !== pubkey ? (
-          <Box direction="row" style={styles.followButton} gap="medium">
-            <Icon
-              icon={<Flash width={20} height={20} color={Colors.black} />}
-              style={styles.iconWrap}
-              backgroundColor={Colors.yellow}
-              size={32}
-              isTransparent
-              onPress={() => {}}
-            />
-            <Icon
-              icon={<SendMail width={20} height={20} color={Colors.white} />}
-              style={styles.iconWrap}
-              backgroundColor={Colors.link}
-              size={32}
-              isTransparent
-              onPress={() => {}}
-            />
-            <Button
-              label="Follow"
-              primary
-              size="small"
-              filled={false}
-              style={{ width: 100 }}
-              onPress={() => {
-                navigation.navigate('AccountEdit')
-              }}
-            />
-          </Box>
-        ) : (
-          <Box direction="row" style={styles.followButton} gap="medium">
-            <Button
-              label="Edit"
-              primary={false}
-              size="small"
-              filled={false}
-              style={{ width: 100 }}
-              onPress={() => {
-                navigation.navigate('AccountEdit')
-              }}
-            />
-          </Box>
-        )}
       </ImageBackground>
+
+      {ipubkey !== pubkey ? (
+        <Box direction="row" full style={styles.followButton} gap="medium">
+          <Icon
+            icon={<Flash width={20} height={20} color={Colors.black} />}
+            style={styles.iconWrap}
+            backgroundColor={Colors.yellow}
+            size={32}
+            isTransparent
+            onPress={() => {}}
+          />
+          <Icon
+            icon={<SendMail width={20} height={20} color={Colors.white} />}
+            style={styles.iconWrap}
+            backgroundColor={Colors.link}
+            size={32}
+            isTransparent
+            onPress={() => {}}
+          />
+          <Button
+            label={isFollowed ? 'Unfollow' : 'Follow'}
+            primary={!isFollowed}
+            size="small"
+            filled={false}
+            style={{ width: 100 }}
+            onPress={onToggleFollow}
+          />
+        </Box>
+      ) : (
+        <Box direction="row" full style={styles.followButton} gap="medium">
+          <Button
+            label="Edit"
+            primary={false}
+            size="small"
+            filled={false}
+            style={{ width: 100 }}
+            onPress={() => {
+              navigation.navigate('AccountEdit')
+            }}
+          />
+        </Box>
+      )}
 
       <Box
         direction="column"
@@ -117,7 +130,7 @@ export default function ProfileHeader({
         justify="center"
         gap="small"
         full
-        style={{ paddingTop: 36 }}
+        style={{ paddingTop: 0 }}
       >
         <Animated.Text
           style={[
@@ -132,14 +145,10 @@ export default function ProfileHeader({
         <Pressable
           onPress={async () => {
             try {
-              setIsCopying(true)
               await Clipboard.setStringAsync(pubkey || '')
               Toast.success('Copied')
-              setTimeout(() => {
-                setIsCopying(false)
-              }, 1000)
             } catch (error) {
-              setIsCopying(false)
+              Toast.error(error)
             }
           }}
         >
@@ -151,6 +160,7 @@ export default function ProfileHeader({
               backgroundColor: Colors[theme].bannerBackground,
             }}
           >
+            <KeyAlt width={24} height={24} color={Colors.gray} />
             <Animated.Text
               style={[
                 styles.pubkey,
@@ -161,11 +171,6 @@ export default function ProfileHeader({
             >
               {ellipsis(pubkey, 10, 8)}
             </Animated.Text>
-            {isCopying ? (
-              <Check width={24} height={24} color={Colors.gray} />
-            ) : (
-              <Copy width={24} height={24} color={Colors[theme].text} />
-            )}
           </Box>
         </Pressable>
 
@@ -178,8 +183,21 @@ export default function ProfileHeader({
             alignItems: 'center',
           }}
         >
-          <Text style={[styles.follow]}>Following</Text>
-          <Text style={[styles.follow, { marginLeft: 20 }]}>Followers</Text>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('AccountList', {
+                title: `Following`,
+                accounts: following,
+              })
+            }
+          >
+            <Text style={[styles.follow]}>
+              <Text style={styles.count}>{following.length}</Text> Following
+            </Text>
+          </Pressable>
+          <Pressable style={{ marginLeft: 20 }}>
+            <Text style={[styles.follow]}>Followers</Text>
+          </Pressable>
         </View>
       </Box>
     </Animated.View>
@@ -189,16 +207,15 @@ export default function ProfileHeader({
 const styles = StyleSheet.create({
   follow: {
     fontSize: 16,
+    color: '#999',
   },
   followButton: {
-    position: 'absolute',
-    right: 10,
-    bottom: -40,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingTop: 10,
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
     position: 'absolute',
     left: 20,
     bottom: -35,
@@ -225,5 +242,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#999',
     margin: 0,
+  },
+  count: {
+    fontFamily: Fonts.heading,
   },
 })

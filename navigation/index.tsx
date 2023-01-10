@@ -41,6 +41,8 @@ import Note from 'screens/Note'
 import Start from 'screens/Start'
 import SignUp from 'screens/SignUp'
 import Login from 'screens/Login'
+import AccountList from 'screens/AccountList'
+import PostNote from 'screens/PostNote'
 
 export default function Navigation() {
   const colorScheme = useColorScheme()
@@ -95,6 +97,11 @@ function RootNavigator() {
         options={{ header: () => null }}
       />
       <Stack.Screen
+        name="AccountList"
+        component={AccountList}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
         name="Start"
         component={Start}
         options={{ header: () => null }}
@@ -111,6 +118,11 @@ function RootNavigator() {
       />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
+        <Stack.Screen
+          name="PostNote"
+          component={PostNote}
+          options={{ header: () => null }}
+        />
       </Stack.Group>
     </Stack.Navigator>
   )

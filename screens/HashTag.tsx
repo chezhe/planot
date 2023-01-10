@@ -1,4 +1,4 @@
-import { FlatList, Image, StyleSheet } from 'react-native'
+import { FlatList, StyleSheet } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import { View } from '../components/Themed'
 import ScreenHeader from 'components/common/ScreenHeader'
@@ -7,7 +7,6 @@ import Relayer from 'service'
 import Toast from 'utils/toast'
 import Post from 'components/Post'
 import { Event } from 'nostr-tools'
-import { CircleFade } from 'react-native-animated-spinkit'
 import ListEmpty from 'components/common/LisstEmpty'
 
 export default function HashTag() {

@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { Pressable, useWindowDimensions } from 'react-native'
-import { Image, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import Relayer from 'service'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Fonts from 'theme/Fonts'
@@ -12,21 +12,24 @@ import { getLinkPreview } from 'link-preview-js'
 import { Text, View } from './Themed'
 import Preview from './Preview'
 import Content from './Content'
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import PostBar from './PostBar'
 import Colors from 'theme/Colors'
 import useColorScheme from 'hooks/useColorScheme'
+import Avatar from './common/Avatar'
 
 export default function Post({
   post,
   profile,
   notFetchProfile,
   isRoot = true,
+  onlyRenderSelf = false,
 }: {
   post: Event
   profile?: Profile
   notFetchProfile?: boolean
   isRoot?: boolean
+  onlyRenderSelf?: boolean
 }) {
   const [iprofile, setIProfile] = useState(profile)
   const [preview, setPreview] = useState<PreviewOfURL>()
@@ -37,7 +40,6 @@ export default function Post({
   const { width } = useWindowDimensions()
   const navigation = useNavigation()
   const theme = useColorScheme()
-  // console.log('post', post)
 
   useEffect(() => {
     if (profile) {
@@ -89,7 +91,7 @@ export default function Post({
       }
     }
 
-    if (isRoot) {
+    if (isRoot && !onlyRenderSelf) {
       const tags = post.tags
 
       if (
@@ -101,7 +103,7 @@ export default function Post({
         fetchContext(id)
       }
     }
-  }, [post, isRoot])
+  }, [post, isRoot, onlyRenderSelf])
 
   const contentWidth = width - 20 - 50 - 8 - 20
 
@@ -114,35 +116,31 @@ export default function Post({
             alignItems: 'flex-start',
             padding: 20,
           },
-          isRoot
+          !isRoot || onlyRenderSelf
             ? {
-                borderBottomColor: Colors[theme].borderColor,
-                borderBottomWidth: StyleSheet.hairlineWidth,
-              }
-            : {
                 borderColor: Colors[theme].borderColor,
                 borderWidth: 1,
                 borderRadius: 8,
                 marginTop: 10,
                 paddingVertical: 4,
                 paddingHorizontal: 0,
+                paddingLeft: onlyRenderSelf ? 10 : 0,
+              }
+            : {
+                borderBottomColor: Colors[theme].borderColor,
+                borderBottomWidth: StyleSheet.hairlineWidth,
               },
         ]}
       >
         {isRoot && (
           <Pressable
             onPress={() =>
-              navigation.navigate('Account', { pubkey: post.pubkey })
+              navigation.dispatch(
+                StackActions.push('Account', { pubkey: post.pubkey })
+              )
             }
           >
-            <Image
-              source={
-                iprofile?.picture
-                  ? { uri: iprofile?.picture }
-                  : require('../assets/images/default-avatar.png')
-              }
-              style={styles.pavatar}
-            />
+            <Avatar src={iprofile?.picture} size={50} pubkey={post.pubkey} />
           </Pressable>
         )}
 
@@ -150,39 +148,44 @@ export default function Post({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {!isRoot && (
               <Pressable
+                style={{ marginRight: 10 }}
                 onPress={() =>
-                  navigation.navigate('Account', { pubkey: post.pubkey })
+                  navigation.dispatch(
+                    StackActions.push('Account', { pubkey: post.pubkey })
+                  )
                 }
               >
-                <Image
-                  source={
-                    iprofile?.picture
-                      ? { uri: iprofile?.picture }
-                      : require('../assets/images/default-avatar.png')
-                  }
-                  style={[
-                    styles.pavatar,
-                    {
-                      width: 30,
-                      height: 30,
-                      borderRadius: 15,
-                      marginRight: 10,
-                    },
-                  ]}
+                <Avatar
+                  src={iprofile?.picture}
+                  size={30}
+                  pubkey={post.pubkey}
                 />
               </Pressable>
             )}
-            <Text
+            <View
               style={{
-                fontSize: 18,
-                fontFamily: Fonts.heading,
+                flexDirection: isRoot ? 'row' : 'column',
+                alignItems: isRoot ? 'center' : 'flex-start',
               }}
             >
-              {iprofile?.name || ellipsis(post.pubkey, 6, 6)}
-            </Text>
-            <Text style={{ color: '#999', marginLeft: 8 }}>
-              {dayjs(post.created_at * 1000).fromNow()}
-            </Text>
+              <Text
+                style={{
+                  fontSize: isRoot ? 18 : 16,
+                  fontFamily: Fonts.heading,
+                }}
+              >
+                {iprofile?.name || ellipsis(post.pubkey, 6, 6)}
+              </Text>
+              <Text
+                style={{
+                  color: '#999',
+                  marginLeft: isRoot ? 8 : 0,
+                  fontSize: isRoot ? 14 : 12,
+                }}
+              >
+                {dayjs(post.created_at * 1000).fromNow()}
+              </Text>
+            </View>
           </View>
           {preview && preview.url === post.content ? null : (
             <Text
@@ -198,7 +201,7 @@ export default function Post({
           )}
           <Preview preview={preview} isRoot={isRoot} />
           {repliedTo && <Post post={repliedTo} isRoot={false} />}
-          {isRoot && <PostBar post={post} />}
+          {isRoot && !onlyRenderSelf && <PostBar post={post} />}
         </View>
       </View>
     </Pressable>

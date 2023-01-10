@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { Linking, StyleSheet } from 'react-native'
 import * as WebBrowser from 'expo-web-browser'
 import Colors from 'theme/Colors'
@@ -74,10 +74,10 @@ export default function Content({ content }: { content: string }) {
   const onPress = async (str: string, pattern: Pattern) => {
     if (pattern.name === 'hashtag') {
       const tag = str.trim().split('#')[1]
-      navigation.navigate('HashTag', { tag })
+      navigation.dispatch(StackActions.push('HashTag', { tag }))
     } else if (pattern.name === 'mention') {
       const pubkey = str.trim().split('@')[1]
-      navigation.navigate('Account', { pubkey })
+      navigation.dispatch(StackActions.push('Account', { pubkey }))
     } else if (pattern.name === 'email') {
       await Linking.openURL(`mailto:${str.trim()}`)
     } else if (pattern.name === 'url') {

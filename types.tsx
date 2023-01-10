@@ -29,6 +29,8 @@ export type RootStackParamList = {
   SignUp: undefined
   AccountEdit: undefined
   NotFound: undefined
+  PostNote: { post?: Event }
+  AccountList: { title: string; accounts: Follow[] }
 }
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
@@ -96,4 +98,9 @@ export interface SettingItem {
   value?: any
   noChevron?: boolean
   onPress: () => void
+}
+
+export interface Follow {
+  pubkey: string
+  relay: string
 }

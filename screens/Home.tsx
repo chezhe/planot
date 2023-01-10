@@ -1,4 +1,4 @@
-import { Animated, FlatList, Image, Pressable, StyleSheet } from 'react-native'
+import { Animated, FlatList, Pressable, StyleSheet } from 'react-native'
 
 import { Text, View } from '../components/Themed'
 import { RootTabScreenProps } from '../types'
@@ -12,11 +12,12 @@ import useColorScheme from '../hooks/useColorScheme'
 import PagerView from 'react-native-pager-view'
 import FollowingFeed from '../components/FollowingFeed'
 import GlobalFeed from '../components/GlobalFeed'
-import { EditPencil, UserCircleAlt } from 'iconoir-react-native'
+import { EditPencil, Search } from 'iconoir-react-native'
 import Relayer from 'service'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Toast from 'utils/toast'
 import { useScrollToTop } from '@react-navigation/native'
+import Avatar from 'components/common/Avatar'
 
 dayjs.extend(relativeTime)
 
@@ -46,8 +47,6 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
           service
             .getProfile(pubkey)
             .then((res) => {
-              console.log('fetching profile', res)
-
               dispatch({
                 type: 'profiles/addProfile',
                 payload: {
@@ -56,15 +55,13 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
                 },
               })
             })
-            .catch(() => Toast.error('Failed to fetch profile'))
+            .catch(() => Toast.error('Profile not set yet'))
         }, 3000)
       } catch (error) {
         console.log('error', error)
       }
     }
-    // !pubkey
-    if (true) {
-      // navigate register screen
+    if (!pubkey) {
       navigation.navigate('Start')
     } else if (!profiles[pubkey]) {
       fetchProfile()
@@ -78,7 +75,18 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
   }
 
   useEffect(() => {
-    new Relayer()
+    const service = new Relayer()
+    setTimeout(() => {
+      service
+        .getFollowingByPubkey(pubkey)
+        .then((res) => {
+          dispatch({
+            type: 'account/updateFollowing',
+            payload: res,
+          })
+        })
+        .catch(console.error)
+    }, 5000)
   }, [])
 
   useScrollToTop(followListRef)
@@ -121,16 +129,15 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
               </Pressable>
             )
           })}
+          <Pressable style={{ position: 'relative', top: 1 }}>
+            <Search width={44} height={44} color={Colors.gray9} />
+          </Pressable>
         </View>
-        <Pressable onPress={() => navigation.navigate('Account', { pubkey })}>
-          <Image
-            source={
-              profiles[pubkey]
-                ? { uri: profiles[pubkey].picture }
-                : require('../assets/images/default-avatar.png')
-            }
-            style={{ width: 32, height: 32, borderRadius: 16 }}
-          />
+        <Pressable
+          style={{ marginHorizontal: 20 }}
+          onPress={() => navigation.navigate('Account', { pubkey })}
+        >
+          <Avatar src={profiles[pubkey]?.picture} size={40} pubkey={pubkey} />
         </Pressable>
       </View>
       <PagerView
@@ -148,18 +155,11 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
           <GlobalFeed ref={globalListRef} />
         </View>
       </PagerView>
-      <View
-        style={{
-          position: 'absolute',
-          backgroundColor: Colors.yellow,
-          padding: 10,
-          right: 10,
-          bottom: 10,
-          borderRadius: 25,
-        }}
-      >
-        <EditPencil width={30} height={30} strokeWidth={2} color="#000" />
-      </View>
+      <Pressable onPress={() => navigation.navigate('PostNote', {})}>
+        <View style={styles.postWrap}>
+          <EditPencil width={30} height={30} strokeWidth={2} color="#000" />
+        </View>
+      </Pressable>
     </View>
   )
 }
@@ -172,15 +172,22 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 30,
     lineHeight: 40,
+    paddingBottom: 6,
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingLeft: 10,
+    alignItems: 'center',
+    borderBottomColor: Colors.gray9,
+    borderBottomWidth: 4,
+    flex: 1,
+    marginHorizontal: 10,
   },
   tabItem: {
-    marginHorizontal: 10,
     borderBottomWidth: 4,
+    position: 'relative',
+    top: 4,
+    marginRight: 15,
   },
   pagerView: {
     flex: 1,
@@ -189,6 +196,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingRight: 18,
+    marginLeft: 10,
+  },
+  postWrap: {
+    position: 'absolute',
+    backgroundColor: Colors.yellow,
+    padding: 10,
+    right: 10,
+    bottom: 10,
+    borderRadius: 25,
   },
 })

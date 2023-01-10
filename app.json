@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "planot",
+    "name": "Planot",
     "slug": "planot",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,20 +15,25 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.chezhe.planot"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "dev.chezhe.planot"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "385e7849-cb51-4b9b-8d54-2d481daf8e47"
+      }
     }
   }
 }

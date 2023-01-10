@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native'
 import {
   ChatBubbleEmpty,
   Heart,
@@ -7,18 +8,21 @@ import {
   ShareIos,
 } from 'iconoir-react-native'
 import { Event } from 'nostr-tools'
-import { StyleSheet } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { View } from './Themed'
 
 export default function PostBar({ post }: { post: Event }) {
   const size = 20
+  const navigation = useNavigation()
   return (
     <View style={styles.wrap}>
       <View style={styles.item}>
         <Heart width={size} height={size} color="#999" />
       </View>
       <View style={styles.item}>
-        <ChatBubbleEmpty width={size} height={size} color="#999" />
+        <Pressable onPress={() => navigation.navigate('PostNote', { post })}>
+          <ChatBubbleEmpty width={size} height={size} color="#999" />
+        </Pressable>
       </View>
       <View style={styles.item}>
         <RefreshDouble width={size} height={size} color="#999" />

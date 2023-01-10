@@ -118,7 +118,7 @@ export default function AnimatedInput(
       <TextInput
         {...props}
         placeholder=""
-        style={[props.style, { color: Colors[theme].text }, styles.input]}
+        style={[{ color: Colors[theme].text }, styles.input, props.style]}
         onFocus={(e) => {
           setFocused(true)
           props.onFocus && props.onFocus(e)

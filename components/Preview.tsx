@@ -13,6 +13,7 @@ import useColorScheme from 'hooks/useColorScheme'
 import Fonts from 'theme/Fonts'
 import { useEffect, useState } from 'react'
 import { Video, ResizeMode } from 'expo-av'
+import FastImage from 'react-native-fast-image'
 
 export default function Preview({
   preview,
@@ -98,7 +99,10 @@ export default function Preview({
           {preview.images && preview.images.length > 0 ? (
             <ImageBackground
               source={{ uri: preview.images[0] }}
-              style={[styles.previewImage, { width: contentWidth - 2 }]}
+              style={[
+                styles.previewImage,
+                { width: contentWidth - (isRoot ? 2 : 12) },
+              ]}
               resizeMode="cover"
               imageStyle={{ borderRadius: 8 }}
             >
@@ -110,11 +114,11 @@ export default function Preview({
         </TouchableOpacity>
       )}
       {preview && preview.mediaType === 'image' && (
-        <Image
+        <FastImage
           source={{ uri: preview.url }}
           style={[
             styles.previewImage,
-            { width: contentWidth - 2, height: imageHeight },
+            { width: contentWidth - (isRoot ? 2 : 12), height: imageHeight },
           ]}
           resizeMode="cover"
         />
@@ -156,7 +160,7 @@ function Favicon({ favicons }: { favicons: string[] | undefined }) {
     return null
   }
   return (
-    <Image
+    <FastImage
       source={{ uri: url }}
       style={{ width: 20, height: 20, marginRight: 10 }}
     />

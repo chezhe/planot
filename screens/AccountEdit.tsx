@@ -1,11 +1,12 @@
 import AnimatedInput from 'components/common/AnimatedInput'
+import Avatar from 'components/common/Avatar'
 import Box from 'components/common/Box'
 import Button from 'components/common/Button'
 import ScreenHeader from 'components/common/ScreenHeader'
 import useColorScheme from 'hooks/useColorScheme'
 import _ from 'lodash'
 import { useState } from 'react'
-import { Image, ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { useAppSelector } from 'store/hooks'
 import Colors from 'theme/Colors'
 
@@ -43,14 +44,7 @@ export default function AccountEdit({
       >
         <Box direction="column" gap="large">
           <Box pad="medium" align="center" justify="center">
-            <Image
-              source={
-                iprofile?.picture
-                  ? { uri: profiles[pubkey].picture }
-                  : require('../assets/images/default-avatar.png')
-              }
-              style={{ width: 100, height: 100, borderRadius: 50 }}
-            />
+            <Avatar src={iprofile?.picture} size={100} pubkey={pubkey} />
           </Box>
           <Box
             full

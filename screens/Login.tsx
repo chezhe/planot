@@ -1,49 +1,78 @@
 import Box from 'components/common/Box'
 import Button from 'components/common/Button'
-import Heading from 'components/common/Heading'
 import ScreenHeader from 'components/common/ScreenHeader'
-import { Copy } from 'iconoir-react-native'
-import { useEffect, useState } from 'react'
-import { Pressable, StyleSheet } from 'react-native'
+import { useState } from 'react'
+import { StyleSheet } from 'react-native'
 import Colors from 'theme/Colors'
 import Fonts from 'theme/Fonts'
-import * as Clipboard from 'expo-clipboard'
-
-import { Text, View } from '../components/Themed'
+import { View } from '../components/Themed'
 import { RootStackScreenProps } from '../types'
 import Toast from 'utils/toast'
+import AnimatedInput from 'components/common/AnimatedInput'
+import useColorScheme from 'hooks/useColorScheme'
+import { getPublicKey } from 'nostr-tools'
+import { useAppDispatch } from 'store/hooks'
 
 export default function Login({ navigation }: RootStackScreenProps<'Login'>) {
-  const [privKey, setPrivKey] = useState(
-    'dd21d1593f30448180949feb472bba3e943b25b22e4f6aa55490c1664227d751'
-  )
-  useEffect(() => {
-    // const privKey = generatePrivateKey()
-    // setPrivKey(privKey)
-  }, [])
+  const [privkey, setPrivkey] = useState('')
+  const [pubkey, setPubkey] = useState('')
+  const [focused, setFocused] = useState(false)
+
+  const theme = useColorScheme()
+
+  const dispatch = useAppDispatch()
+
+  function onConfirm() {
+    try {
+      const pubkey = getPublicKey(privkey)
+      setPubkey(pubkey)
+      dispatch({
+        type: 'account/login',
+        payload: {
+          privkey,
+          pubkey,
+        },
+      })
+      navigation.popToTop()
+    } catch (error) {
+      Toast.error(error)
+    }
+  }
+
   return (
     <View style={styles.container}>
       <ScreenHeader title="Login" />
       <View style={styles.content}>
-        <View style={styles.privKeyWrap}>
-          <Box direction="row" align="center" justify="space-between">
-            <Heading level={2}>Private key</Heading>
-            <Pressable
-              onPress={async () => {
-                try {
-                  await Clipboard.setStringAsync(privKey)
-                  Toast.success('Copied to clipboard')
-                } catch (error) {
-                  Toast.error(error)
-                }
-              }}
-            >
-              <Copy width={32} height={32} color={Colors.gray9} />
-            </Pressable>
+        <Box direction="column" gap="large" full>
+          <Box
+            full
+            style={{
+              paddingVertical: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: focused
+                ? Colors[theme].text
+                : Colors[theme].borderColor,
+              height: 80,
+            }}
+          >
+            <AnimatedInput
+              placeholder="Private Key"
+              value={privkey}
+              onChangeText={(_text) => setPrivkey(_text)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholderTextColor={Colors.gray9}
+              animatedLeft={0}
+              maxLength={64}
+              autoCorrect={false}
+              multiline
+              numberOfLines={3}
+              style={{ fontSize: 18, height: 160 }}
+            />
           </Box>
-          <Text style={styles.privKey}>{privKey}</Text>
-        </View>
-        <Button label="Proceed" primary onPress={() => {}} />
+
+          <Button label="Proceed" primary onPress={onConfirm} />
+        </Box>
       </View>
     </View>
   )
@@ -66,6 +95,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     marginBottom: 20,
+    width: '100%',
   },
   privKey: {
     fontFamily: Fonts.variable,

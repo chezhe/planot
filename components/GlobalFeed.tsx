@@ -1,10 +1,8 @@
 import { Event } from 'nostr-tools'
 import { RefObject, useEffect, useState, forwardRef } from 'react'
-import { FlatList, Image } from 'react-native'
+import { FlatList } from 'react-native'
 import Relayer from 'service'
-import { CircleFade } from 'react-native-animated-spinkit'
 import Post from './Post'
-import { Text, View } from './Themed'
 import ListEmpty from './common/LisstEmpty'
 import Toast from 'utils/toast'
 
@@ -16,24 +14,31 @@ const GlobalFeed = forwardRef<FlatList, Props>((props, ref) => {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
+  function fetchFeed(refreshing: boolean) {
+    setRefreshing(refreshing)
+    const service = new Relayer()
+    service
+      .getGlobalFeed()
+      .then((res) => {
+        setIsLoading(false)
+        setRefreshing(false)
+        setPosts(res)
+      })
+      .catch((err) => {
+        setIsLoading(false)
+        setRefreshing(false)
+        Toast.error(err)
+      })
+  }
   useEffect(() => {
     async function init() {
       try {
         setIsLoading(true)
         setTimeout(() => {
-          const service = new Relayer()
-          service
-            .getGlobalFeed()
-            .then((res) => {
-              setIsLoading(false)
-              setPosts(res)
-            })
-            .catch((err) => {
-              setIsLoading(false)
-              Toast.error(err)
-            })
-        }, 10000)
+          fetchFeed(false)
+        }, 5000)
       } catch (error) {}
     }
 
@@ -50,6 +55,8 @@ const GlobalFeed = forwardRef<FlatList, Props>((props, ref) => {
       ListEmptyComponent={
         <ListEmpty isLoading={isLoading} title="No posts yet" />
       }
+      onRefresh={() => fetchFeed(true)}
+      refreshing={refreshing}
     />
   )
 })

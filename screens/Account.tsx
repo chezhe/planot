@@ -1,4 +1,4 @@
-import { Animated, FlatList, Image, StyleSheet } from 'react-native'
+import { Animated, FlatList, StyleSheet } from 'react-native'
 
 import { View } from '../components/Themed'
 import { Profile, RootStackScreenProps } from '../types'
@@ -18,7 +18,6 @@ import { NavArrowLeft } from 'iconoir-react-native'
 import { hasDynamicIsland } from 'utils'
 import Icon from 'components/common/Icon'
 import { BlurView } from 'expo-blur'
-import { CircleFade } from 'react-native-animated-spinkit'
 import ListEmpty from 'components/common/LisstEmpty'
 
 dayjs.extend(relativeTime)

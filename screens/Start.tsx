@@ -1,9 +1,10 @@
 import Box from 'components/common/Box'
 import Button from 'components/common/Button'
 import Heading from 'components/common/Heading'
-import { Image, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Fonts from 'theme/Fonts'
+import FastImage from 'react-native-fast-image'
 
 import { Text, View } from '../components/Themed'
 import { RootStackScreenProps } from '../types'
@@ -24,7 +25,7 @@ export default function Start({ navigation }: RootStackScreenProps<'Start'>) {
         <Heading>Planot</Heading>
 
         <Box direction="column" gap="medium" style={{ marginTop: 20 }}>
-          <Image
+          <FastImage
             source={require('../assets/images/logo.png')}
             style={styles.logo}
           />

@@ -1,8 +1,8 @@
 import { Text, View } from 'components/Themed'
-import { Image } from 'react-native'
 import { CircleFade } from 'react-native-animated-spinkit'
 import Colors from 'theme/Colors'
 import Fonts from 'theme/Fonts'
+import FastImage from 'react-native-fast-image'
 
 export default function ListEmpty({
   isLoading,
@@ -31,7 +31,7 @@ export default function ListEmpty({
         padding: 50,
       }}
     >
-      <Image
+      <FastImage
         source={require('../../assets/images/empty.png')}
         style={{ width: 160, height: 160 }}
       />
