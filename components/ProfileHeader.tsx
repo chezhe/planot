@@ -1,5 +1,5 @@
 import useColorScheme from 'hooks/useColorScheme'
-import { Check, Copy, Flash, KeyAlt, SendMail } from 'iconoir-react-native'
+import { Flash, KeyAlt, SendMail } from 'iconoir-react-native'
 import {
   Animated,
   ImageBackground,
@@ -119,7 +119,7 @@ export default function ProfileHeader({
             onPress={() => {}}
           />
           <Button
-            label={isFollowed ? 'Unfollow' : 'Follow'}
+            label={isFollowed ? 'Following' : 'Follow'}
             primary={!isFollowed}
             size="small"
             filled={false}

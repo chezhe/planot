@@ -3,16 +3,32 @@
     "version": ">= 3.1.1"
   },
   "build": {
+    "base": {
+      "android": {
+        "autoIncrement": true
+      },
+      "ios": {
+        "autoIncrement": true
+      }
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
+      "extends": "base",
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "extends": "base"
+    }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "companyName": "Wuxi Yuanchuan Information Technology Co., Ltd."
+      }
+    }
   }
 }

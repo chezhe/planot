@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "postinstall": "rn-nodeify --install buffer,stream --hack && patch-package"
   },
   "jest": {
     "preset": "jest-expo"
@@ -31,18 +32,24 @@
     "expo-dev-client": "~2.0.1",
     "expo-device": "~5.0.0",
     "expo-font": "~11.0.1",
+    "expo-linear-gradient": "~12.0.1",
     "expo-linking": "~3.3.0",
+    "expo-modules-autolinking": "1.0.2",
     "expo-random": "~13.0.0",
     "expo-splash-screen": "~0.17.5",
+    "expo-standard-web-crypto": "^1.4.1",
     "expo-status-bar": "~1.4.2",
     "expo-system-ui": "~2.0.1",
     "expo-web-browser": "~12.0.0",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "iconoir-react-native": "^5.5.2",
+    "isomorphic-webcrypto": "^2.3.8",
     "link-preview-js": "^3.0.4",
     "lodash": "^4.17.21",
     "lru-cache": "^7.14.1",
+    "moti": "^0.21.0",
     "nostr-tools": "^1.0.1",
+    "patch-package": "^6.5.1",
     "pubsub-js": "^1.9.4",
     "react": "18.1.0",
     "react-dom": "18.1.0",
@@ -53,14 +60,18 @@
     "react-native-get-random-values": "^1.8.0",
     "react-native-jazzicon": "^0.1.2",
     "react-native-pager-view": "6.0.1",
+    "react-native-randombytes": "^3.0.0",
     "react-native-reanimated": "~2.12.0",
     "react-native-safe-area-context": "4.4.1",
     "react-native-screens": "~3.18.0",
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.9",
     "react-redux": "^8.0.5",
+    "readable-stream": "1.0.33",
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
+    "rn-nodeify": "^10.3.0",
+    "stream-browserify": "^1.0.0",
     "swr": "^2.0.0"
   },
   "devDependencies": {
@@ -76,5 +87,21 @@
     "react-test-renderer": "18.1.0",
     "typescript": "^4.6.3"
   },
-  "private": true
+  "private": true,
+  "react-native": {
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  },
+  "browser": {
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  }
 }

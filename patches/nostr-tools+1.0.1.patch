@@ -1,0 +1,13 @@
+diff --git a/node_modules/nostr-tools/nip04.ts b/node_modules/nostr-tools/nip04.ts
+index 34b6655..a3b7ccd 100644
+--- a/node_modules/nostr-tools/nip04.ts
++++ b/node_modules/nostr-tools/nip04.ts
+@@ -1,7 +1,7 @@
+ import {randomBytes} from '@noble/hashes/utils'
+ import * as secp256k1 from '@noble/secp256k1'
+ import {encode as b64encode, decode as b64decode} from 'base64-arraybuffer'
+-
++import crypto from 'isomorphic-webcrypto'
+ import {utf8Decoder, utf8Encoder} from './utils'
+ 
+ export async function encrypt(

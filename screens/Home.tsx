@@ -4,8 +4,6 @@ import { View } from '../components/Themed'
 import { RootTabScreenProps } from '../types'
 import { useEffect, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import Fonts from '../theme/Fonts'
 import Colors from '../theme/Colors'
 import useColorScheme from '../hooks/useColorScheme'
@@ -18,8 +16,6 @@ import { useAppDispatch, useAppSelector } from 'store/hooks'
 import Toast from 'utils/toast'
 import { useScrollToTop } from '@react-navigation/native'
 import Avatar from 'components/common/Avatar'
-
-dayjs.extend(relativeTime)
 
 export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
   const routes = [

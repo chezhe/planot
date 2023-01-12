@@ -18,7 +18,7 @@ import Colors from 'theme/Colors'
 import useColorScheme from 'hooks/useColorScheme'
 import Avatar from './common/Avatar'
 import Box from './common/Box'
-import { CircleFade, Wave } from 'react-native-animated-spinkit'
+import LoadingPost from './Skeleton/LoadingPost'
 
 export default function Post({
   post,
@@ -222,7 +222,7 @@ export default function Post({
                 marginTop: 10,
               }}
             >
-              <Wave size={50} color="#999" />
+              <LoadingPost />
             </Box>
           )}
           {isRoot && !onlyRenderSelf && <PostBar post={post} />}

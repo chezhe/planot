@@ -6,8 +6,6 @@ import { useEffect, useRef, useState } from 'react'
 import Relayer from '../service'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Event } from 'nostr-tools'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute } from '@react-navigation/native'
 import Post from 'components/Post'
 import { useAppDispatch, useAppSelector } from 'store/hooks'
@@ -20,8 +18,6 @@ import Icon from 'components/common/Icon'
 import { BlurView } from 'expo-blur'
 import ListEmpty from 'components/common/LisstEmpty'
 import { FlashList } from '@shopify/flash-list'
-
-dayjs.extend(relativeTime)
 
 export default function Account({
   navigation,
