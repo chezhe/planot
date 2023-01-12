@@ -1,6 +1,6 @@
-import { Animated, FlatList, Pressable, StyleSheet } from 'react-native'
-
-import { Text, View } from '../components/Themed'
+import { Animated, Pressable, StyleSheet } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
+import { View } from '../components/Themed'
 import { RootTabScreenProps } from '../types'
 import { useEffect, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -29,8 +29,8 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
 
   const [index, setIndex] = useState(0)
   const pagerRef = useRef<PagerView>(null)
-  const followListRef = useRef<FlatList>(null)
-  const globalListRef = useRef<FlatList>(null)
+  const followListRef = useRef<FlashList<Event>>(null)
+  const globalListRef = useRef<FlashList<Event>>(null)
 
   const insets = useSafeAreaInsets()
   const theme = useColorScheme()
@@ -129,7 +129,10 @@ export default function Home({ navigation }: RootTabScreenProps<'Home'>) {
               </Pressable>
             )
           })}
-          <Pressable style={{ position: 'relative', top: 1 }}>
+          <Pressable
+            style={{ position: 'relative', top: 1 }}
+            onPress={() => navigation.navigate('Search')}
+          >
             <Search width={44} height={44} color={Colors.gray9} />
           </Pressable>
         </View>

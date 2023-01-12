@@ -16,18 +16,20 @@ import { RootStackScreenProps } from '../types'
 export default function AccountEdit({
   navigation,
 }: RootStackScreenProps<'AccountEdit'>) {
-  const { pubkey } = useAppSelector((state) => state.account)
+  const { pubkey, privkey } = useAppSelector((state) => state.account)
   const profiles = useAppSelector((state) => state.profile)
   const [iprofile, setIProfile] = useState(
     profiles[pubkey] || {
       name: '',
       picture: '',
       about: '',
+      nip05: '',
     }
   )
   const [nameFocus, setNameFocus] = useState(false)
   const [aboutFocus, setAboutFocus] = useState(false)
   const [avatarFocus, setAvatarFocus] = useState(false)
+  const [nip05Focus, setNip05Focus] = useState(false)
   const theme = useColorScheme()
 
   let isDisabled = false
@@ -121,6 +123,75 @@ export default function AccountEdit({
               maxLength={30}
               numberOfLines={3}
               autoCorrect={false}
+            />
+          </Box>
+
+          <Box
+            full
+            style={{
+              paddingVertical: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: nip05Focus
+                ? Colors[theme].text
+                : Colors[theme].borderColor,
+            }}
+          >
+            <AnimatedInput
+              placeholder="NIP05"
+              value={iprofile.nip05}
+              onChangeText={(_text) =>
+                setIProfile({ ...iprofile, nip05: _text })
+              }
+              onFocus={() => setNip05Focus(true)}
+              onBlur={() => setNip05Focus(false)}
+              placeholderTextColor={Colors.gray9}
+              animatedLeft={0}
+              maxLength={30}
+              autoCorrect={false}
+            />
+          </Box>
+
+          <Box
+            full
+            style={{
+              paddingVertical: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: Colors[theme].borderColor,
+            }}
+          >
+            <AnimatedInput
+              placeholder="Private Key"
+              value={privkey}
+              onChangeText={(_text) => {}}
+              placeholderTextColor={Colors.gray9}
+              animatedLeft={-10}
+              maxLength={64}
+              numberOfLines={3}
+              autoCorrect={false}
+              editable={false}
+              multiline
+            />
+          </Box>
+
+          <Box
+            full
+            style={{
+              paddingVertical: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: Colors[theme].borderColor,
+            }}
+          >
+            <AnimatedInput
+              placeholder="Public Key"
+              value={pubkey}
+              onChangeText={(_text) => {}}
+              placeholderTextColor={Colors.gray9}
+              animatedLeft={-10}
+              maxLength={64}
+              numberOfLines={3}
+              autoCorrect={false}
+              editable={false}
+              multiline
             />
           </Box>
 

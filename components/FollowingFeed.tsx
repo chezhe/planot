@@ -1,18 +1,16 @@
 import { Event } from 'nostr-tools'
 import { RefObject, useEffect, useState, forwardRef } from 'react'
-import { FlatList } from 'react-native'
-import { CircleFade } from 'react-native-animated-spinkit'
 import Relayer from 'service'
 import { useAppSelector } from 'store/hooks'
 import ListEmpty from './common/LisstEmpty'
 import Post from './Post'
-import { View } from './Themed'
+import { FlashList } from '@shopify/flash-list'
 
 interface Props {
-  ref: RefObject<FlatList>
+  ref: RefObject<FlashList<Event>>
 }
 
-const FollowingFeed = forwardRef<FlatList, Props>((props, ref) => {
+const FollowingFeed = forwardRef<FlashList<Event>, Props>((props, ref) => {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -49,8 +47,9 @@ const FollowingFeed = forwardRef<FlatList, Props>((props, ref) => {
   }, [])
 
   return (
-    <FlatList
+    <FlashList
       ref={ref}
+      estimatedItemSize={80}
       data={posts}
       renderItem={({ item }) => {
         return <Post post={item} />

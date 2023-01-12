@@ -30,6 +30,9 @@ export type RootStackParamList = {
   AccountEdit: undefined
   NotFound: undefined
   PostNote: { post?: Event }
+  RelayManage: undefined
+  Search: undefined
+  AddRelay: undefined
   AccountList: { title: string; accounts: Follow[] }
 }
 
@@ -52,6 +55,7 @@ export interface Profile {
   name: string
   picture: string
   about: string
+  nip05: string
 }
 
 export type PreviewOfURL = {
@@ -101,6 +105,16 @@ export interface SettingItem {
 }
 
 export interface Follow {
+  tag: string
   pubkey: string
   relay: string
+  name?: string
+}
+
+export interface RelayItem {
+  relay: string
+  permission: {
+    write: boolean
+    read: boolean
+  }
 }

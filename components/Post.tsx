@@ -17,6 +17,8 @@ import PostBar from './PostBar'
 import Colors from 'theme/Colors'
 import useColorScheme from 'hooks/useColorScheme'
 import Avatar from './common/Avatar'
+import Box from './common/Box'
+import { CircleFade, Wave } from 'react-native-animated-spinkit'
 
 export default function Post({
   post,
@@ -34,6 +36,7 @@ export default function Post({
   const [iprofile, setIProfile] = useState(profile)
   const [preview, setPreview] = useState<PreviewOfURL>()
   const [repliedTo, setRepliedTo] = useState<Event>()
+  const [fetchingContext, setFetchingContext] = useState(false)
 
   const profiles = useAppSelector((state) => state.profile)
   const dispatch = useAppDispatch()
@@ -82,12 +85,17 @@ export default function Post({
 
     async function fetchContext(id: string) {
       try {
+        if (!repliedTo) {
+          setFetchingContext(true)
+        }
         const service = new Relayer()
         const repliedPost = await service.getPostById(id)
 
         setRepliedTo(repliedPost)
+        setFetchingContext(false)
       } catch (error) {
         console.log('error', error)
+        setFetchingContext(false)
       }
     }
 
@@ -201,6 +209,22 @@ export default function Post({
           )}
           <Preview preview={preview} isRoot={isRoot} />
           {repliedTo && <Post post={repliedTo} isRoot={false} />}
+          {fetchingContext && (
+            <Box
+              direction="column"
+              align="center"
+              justify="center"
+              pad="medium"
+              style={{
+                borderColor: Colors[theme].borderColor,
+                borderWidth: 1,
+                borderRadius: 8,
+                marginTop: 10,
+              }}
+            >
+              <Wave size={50} color="#999" />
+            </Box>
+          )}
           {isRoot && !onlyRenderSelf && <PostBar post={post} />}
         </View>
       </View>

@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import { View } from '../components/Themed'
 import ScreenHeader from 'components/common/ScreenHeader'
@@ -8,6 +8,7 @@ import Toast from 'utils/toast'
 import Post from 'components/Post'
 import { Event } from 'nostr-tools'
 import ListEmpty from 'components/common/LisstEmpty'
+import { FlashList } from '@shopify/flash-list'
 
 export default function HashTag() {
   const { params } = useRoute()
@@ -35,7 +36,8 @@ export default function HashTag() {
   return (
     <View style={styles.container}>
       <ScreenHeader title={`#${tag}`} />
-      <FlatList
+      <FlashList
+        estimatedItemSize={80}
         data={posts}
         renderItem={({ item }) => {
           return <Post post={item} />

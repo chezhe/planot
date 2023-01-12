@@ -134,7 +134,9 @@ export default class Relayer {
         kinds: [3],
       },
     ])
+
     return _.flatten(result.map((t) => t.tags)).map((t) => ({
+      tag: t[0],
       pubkey: t[1],
       relay: t[2],
     }))
@@ -179,5 +181,27 @@ export default class Relayer {
         limit: 10,
       },
     ])
+  }
+
+  public async getMessagesByPubkey(pubkey: string): Promise<Event[]> {
+    return query(Relayer.relays, [
+      {
+        authors: [pubkey],
+        kinds: [4],
+        limit: 10,
+      },
+    ])
+  }
+
+  public async getNoteThread(id: string): Promise<Event[]> {
+    const result = await query(Relayer.relays, [
+      {
+        kinds: [1],
+        '#e': [id],
+        limit: 10,
+      },
+    ])
+
+    return result
   }
 }

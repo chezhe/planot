@@ -30,7 +30,9 @@ export default function Settings({
               icon: Server,
               title: 'Relays',
               value: '',
-              onPress: () => {},
+              onPress: () => {
+                navigation.navigate('RelayManage')
+              },
             },
             {
               icon: Brightness,

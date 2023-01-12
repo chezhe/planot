@@ -1,16 +1,16 @@
 import { Event } from 'nostr-tools'
 import { RefObject, useEffect, useState, forwardRef } from 'react'
-import { FlatList } from 'react-native'
 import Relayer from 'service'
 import Post from './Post'
 import ListEmpty from './common/LisstEmpty'
 import Toast from 'utils/toast'
+import { FlashList } from '@shopify/flash-list'
 
 interface Props {
-  ref: RefObject<FlatList>
+  ref: RefObject<FlashList<Event>>
 }
 
-const GlobalFeed = forwardRef<FlatList, Props>((props, ref) => {
+const GlobalFeed = forwardRef<FlashList<Event>, Props>((props, ref) => {
   const [page, setPage] = useState(0)
   const [posts, setPosts] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -46,8 +46,9 @@ const GlobalFeed = forwardRef<FlatList, Props>((props, ref) => {
   }, [])
 
   return (
-    <FlatList
+    <FlashList
       ref={ref}
+      estimatedItemSize={80}
       data={posts}
       renderItem={({ item }) => {
         return <Post post={item} />

@@ -102,7 +102,7 @@ export default function Button({
 const styles = StyleSheet.create({
   button: {
     borderColor: '#333',
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 4,
     width: '100%',
     flexDirection: 'row',

@@ -28,7 +28,6 @@ import LinkingConfiguration from './LinkingConfiguration'
 import {
   HomeAlt,
   Mail,
-  MailOpened,
   Home as HomeEmpty,
   Settings,
   SendMail,
@@ -43,6 +42,9 @@ import SignUp from 'screens/SignUp'
 import Login from 'screens/Login'
 import AccountList from 'screens/AccountList'
 import PostNote from 'screens/PostNote'
+import RelayManage from 'screens/RelayManage'
+import Search from 'screens/Search'
+import AddRelay from 'screens/AddRelay'
 
 export default function Navigation() {
   const colorScheme = useColorScheme()
@@ -102,6 +104,16 @@ function RootNavigator() {
         options={{ header: () => null }}
       />
       <Stack.Screen
+        name="RelayManage"
+        component={RelayManage}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
+        name="Search"
+        component={Search}
+        options={{ header: () => null }}
+      />
+      <Stack.Screen
         name="Start"
         component={Start}
         options={{ header: () => null }}
@@ -121,6 +133,11 @@ function RootNavigator() {
         <Stack.Screen
           name="PostNote"
           component={PostNote}
+          options={{ header: () => null }}
+        />
+        <Stack.Screen
+          name="AddRelay"
+          component={AddRelay}
           options={{ header: () => null }}
         />
       </Stack.Group>
@@ -157,7 +174,7 @@ function BottomTabNavigator() {
               focused: boolean
             }) => {
               return focused ? (
-                <HomeAlt width={30} height={30} strokeWidth={1} />
+                <HomeAlt width={30} height={30} strokeWidth={2} />
               ) : (
                 <HomeEmpty width={30} height={30} strokeWidth={1} />
               )
@@ -179,10 +196,8 @@ function BottomTabNavigator() {
               color: string
               focused: boolean
             }) => {
-              return focused ? (
-                <SendMail width={30} height={30} strokeWidth={1} />
-              ) : (
-                <Mail width={30} height={30} strokeWidth={1} />
+              return (
+                <Mail width={30} height={30} strokeWidth={focused ? 2 : 1} />
               )
             },
             headerShown: false,

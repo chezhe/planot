@@ -1,9 +1,10 @@
 import { useRoute } from '@react-navigation/native'
 import AccountItem from 'components/AccountItem'
 import ScreenHeader from 'components/common/ScreenHeader'
-import { FlatList, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 
-import { Text, View } from '../components/Themed'
+import { View } from '../components/Themed'
 import { Follow, RootStackScreenProps } from '../types'
 
 export default function AccountList({
@@ -16,7 +17,8 @@ export default function AccountList({
   return (
     <View style={styles.container}>
       <ScreenHeader title={`${title}`} />
-      <FlatList
+      <FlashList
+        estimatedItemSize={80}
         data={list}
         renderItem={({ item }) => {
           return <AccountItem pubkey={item.pubkey} />

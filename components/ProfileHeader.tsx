@@ -54,7 +54,25 @@ export default function ProfileHeader({
 
   const isFollowed = ifollowing.some((t) => t.pubkey === pubkey)
 
-  const onToggleFollow = async () => {}
+  const onToggleFollow = async () => {
+    if (!pubkey) {
+      return Toast.error('Invalid pubkey')
+    }
+    let tags = ifollowing
+    if (isFollowed) {
+      tags = tags.filter((t) => t.pubkey !== pubkey)
+    } else {
+      tags = tags.concat({ tag: 'p', pubkey: pubkey || '', relay: '' })
+    }
+
+    const followEvent = {
+      pubkey: ipubkey,
+      created_at: Math.floor(Date.now() / 1000),
+      kind: 3,
+      tags: tags.map((t) => [t.tag, t.pubkey, t.relay]),
+      content: JSON.stringify([]),
+    }
+  }
 
   return (
     <Animated.View

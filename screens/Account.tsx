@@ -1,4 +1,4 @@
-import { Animated, FlatList, StyleSheet } from 'react-native'
+import { Animated, StyleSheet } from 'react-native'
 
 import { View } from '../components/Themed'
 import { Profile, RootStackScreenProps } from '../types'
@@ -19,6 +19,7 @@ import { hasDynamicIsland } from 'utils'
 import Icon from 'components/common/Icon'
 import { BlurView } from 'expo-blur'
 import ListEmpty from 'components/common/LisstEmpty'
+import { FlashList } from '@shopify/flash-list'
 
 dayjs.extend(relativeTime)
 
@@ -144,16 +145,13 @@ export default function Account({
         </Animated.View>
       )}
 
-      <FlatList
+      <FlashList
+        estimatedItemSize={80}
         data={(posts || []).sort((a, b) => b.created_at - a.created_at)}
         ListHeaderComponent={
           <ProfileHeader profile={profile} pubkey={pubkey} />
         }
         keyExtractor={({ id, sig }) => id!}
-        style={{
-          flex: isLoading ? undefined : 1,
-          backgroundColor: Colors[theme].background,
-        }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
           { useNativeDriver: false }
